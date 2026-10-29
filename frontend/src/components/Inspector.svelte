@@ -21,6 +21,12 @@
   const action = $derived(info?.rule?.action ?? '')
   const opensPicker = $derived(!!pickerView[action] && !takesPath(action))
 
+  async function suggestRule() {
+    if (!node) return
+    const details = `${node.isDir ? 'Folder' : 'File'}, ${bytes(node.bytes)}`
+    attempt(api.OpenURL(await api.SuggestRuleURL(node.path, details)))
+  }
+
   function runAction() {
     if (!action || !node) return
     openAction(action, node.path)
@@ -97,6 +103,7 @@
           <p class="muted">
             Not recognised. If you did not create it, leave it alone or check what owns it first.
           </p>
+          <button class="quiet link" onclick={suggestRule}>Suggest a rule for this</button>
         {/if}
       </section>
 

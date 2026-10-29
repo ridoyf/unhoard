@@ -286,7 +286,12 @@ func (a *App) Explain(path string) Explanation {
 	return e
 }
 
-// refusal is the guard's reason without the error prefix, ready to show the user.
+// SuggestRuleURL is a GitHub issue asking for a rule that recognises path, with the
+// user's own folders replaced by variables.
+func (a *App) SuggestRuleURL(path, details string) string {
+	return kb.SuggestURL(kb.Generalise(path, os.Getenv), details)
+}
+
 // checkQuarantine runs every check Move would, plus "nothing inside is a never item".
 func (a *App) checkQuarantine(path string) error {
 	if err := a.guard.Check(path); err != nil {

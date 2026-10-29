@@ -1,6 +1,7 @@
 package kb
 
 import (
+	"strings"
 	"testing"
 	"testing/fstest"
 
@@ -174,5 +175,31 @@ func TestLoadRejectsBadRules(t *testing.T) {
 		if _, err := Load(getenv, fstest.MapFS{"x.yaml": {Data: []byte(yaml)}}); err == nil {
 			t.Errorf("%s: expected an error", name)
 		}
+	}
+}
+
+func TestGeneralise(t *testing.T) {
+	for _, tc := range []struct{ in, want string }{
+		{`C:\Users\test\AppData\Local\Acme\Cache`, `%LOCALAPPDATA%\Acme\Cache`},
+		{`C:\Users\test\AppData\Local\Temp\x`, `%TEMP%\x`},
+		{`C:\Users\bob\AppData\Roaming\Acme`, `%APPDATA%\Acme`},
+		{`c:\users\TEST\.cache`, `%USERPROFILE%\.cache`},
+		{`C:\Users\bob`, `%USERPROFILE%`},
+		{`C:\Users\Public\Documents\x`, `%PUBLIC%\Documents\x`},
+		{`C:\Program Files (x86)\Acme`, `%ProgramFiles(x86)%\Acme`},
+		{`C:\Windows\Logs`, `%SystemRoot%\Logs`},
+		{`C:\Acme`, `%SystemDrive%\Acme`},
+		{`D:\Games\Acme`, `D:\Games\Acme`},
+	} {
+		if got := Generalise(tc.in, getenv); got != tc.want {
+			t.Errorf("Generalise(%s) = %s, want %s", tc.in, got, tc.want)
+		}
+	}
+}
+
+func TestSuggestURLHasNoRawPath(t *testing.T) {
+	u := SuggestURL(`%LOCALAPPDATA%\Acme`, "Folder, 2.0 GB")
+	if !strings.Contains(u, "template=rule.yml") || !strings.Contains(u, "path=%25LOCALAPPDATA%25%5CAcme") {
+		t.Errorf("SuggestURL = %s", u)
 	}
 }

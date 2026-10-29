@@ -1,0 +1,35 @@
+name: Rule request
+description: A folder or file Unhoard should recognise, or a rule that is wrong
+labels: [rule]
+body:
+  - type: markdown
+    attributes:
+      value: Check the path below before you submit. Remove anything personal, such as a project or document name.
+  - type: input
+    id: path
+    attributes:
+      label: Path
+      description: Use variables such as %LOCALAPPDATA% instead of your own user folder.
+      placeholder: '%LOCALAPPDATA%\Acme\Cache'
+    validations:
+      required: true
+  - type: input
+    id: details
+    attributes:
+      label: Size
+      placeholder: Folder, 2.1 GB
+  - type: textarea
+    id: what
+    attributes:
+      label: What is it?
+      description: Which app makes it, and what happens if it is removed. Leave blank if you do not know; that is why you are asking.
+  - type: dropdown
+    id: safety
+    attributes:
+      label: Is it safe to remove?
+      options:
+        - I don't know
+        - Safe to delete
+        - Rebuilds itself
+        - Remove it through its app
+        - Never touch
