@@ -1,0 +1,329 @@
+# Windows system files and folders. See internal/kb for the schema.
+# Every rule needs tests: at least one path it matches and one it must not.
+
+- id: windows-hiberfil
+  match: '%SystemDrive%\hiberfil.sys'
+  name: Hibernation file
+  owner: Windows
+  description: Holds the contents of memory while the PC hibernates or uses Fast Startup. It is usually 40 to 75 percent of your RAM. Turning hibernation off removes it.
+  safety: delete-via-app
+  action: disable-hibernation
+  learn_more: https://learn.microsoft.com/troubleshoot/windows-client/setup-upgrade-and-drivers/disable-and-re-enable-hibernation
+  tests:
+    match: ['%SystemDrive%\hiberfil.sys']
+    no_match: ['%SystemDrive%\backup\hiberfil.sys', '%SystemDrive%\pagefile.sys']
+
+- id: windows-winsxs
+  match: '%SystemRoot%\WinSxS'
+  name: Windows component store
+  owner: Windows
+  description: Stores every version of Windows system components so updates can be installed and rolled back. Much of its apparent size is hard links shared with System32. Never delete it by hand; DISM component cleanup safely removes superseded versions.
+  safety: delete-via-app
+  action: dism-component-cleanup
+  learn_more: https://learn.microsoft.com/windows-hardware/manufacture/desktop/clean-up-the-winsxs-folder
+  tests:
+    match: ['%SystemRoot%\WinSxS']
+    no_match: ['%SystemRoot%\WinSxS\Temp', '%SystemDrive%\WinSxS']
+
+- id: windows-folder
+  match: '%SystemRoot%'
+  name: Windows folder
+  owner: Windows
+  description: The Windows operating system itself. Removing anything here by hand can stop Windows from starting. Use the cleanup actions for the specific folders inside it that can be trimmed.
+  safety: never
+  tests:
+    match: ['%SystemRoot%']
+    no_match: ['%SystemRoot%\System32', 'D:\Windows']
+
+- id: windows-pagefile
+  match: '%SystemDrive%\pagefile.sys'
+  name: Page file
+  owner: Windows
+  description: Virtual memory that Windows uses when RAM runs short, and to save crash dumps. Windows sizes it automatically. Change or move it in the Virtual memory settings under Advanced system settings, never by deleting the file.
+  safety: delete-via-app
+  learn_more: https://learn.microsoft.com/troubleshoot/windows-client/performance/introduction-to-the-page-file
+  tests:
+    match: ['%SystemDrive%\pagefile.sys']
+    no_match: ['%SystemDrive%\old\pagefile.sys', '%SystemDrive%\swapfile.sys']
+
+- id: windows-swapfile
+  match: '%SystemDrive%\swapfile.sys'
+  name: Swap file for Store apps
+  owner: Windows
+  description: A small file Windows uses to move Microsoft Store apps in and out of memory. It is managed together with the page file and is usually a few hundred megabytes, so leave it alone.
+  safety: never
+  tests:
+    match: ['%SystemDrive%\swapfile.sys']
+    no_match: ['%SystemDrive%\backup\swapfile.sys', '%SystemDrive%\pagefile.sys']
+
+- id: windows-temp
+  match: '%SystemRoot%\Temp'
+  name: Windows temporary files
+  owner: Windows
+  description: Temporary files left by Windows, installers and system services. Anything not currently in use can be removed; files that are in use simply cannot be moved.
+  safety: safe
+  tests:
+    match: ['%SystemRoot%\Temp']
+    no_match: ['%SystemRoot%\Temp\setup.log', '%SystemDrive%\Temp', '%TEMP%']
+
+- id: windows-user-temp
+  match: '%TEMP%'
+  name: Your temporary files
+  owner: Windows and your programs
+  description: Temporary files programs create while they run, which are often never cleaned up. Anything not currently in use can be removed; files that are in use simply cannot be moved.
+  safety: safe
+  tests:
+    match: ['%TEMP%', '%LOCALAPPDATA%\Temp']
+    no_match: ['%TEMP%\chrome_installer.log', '%SystemRoot%\Temp']
+
+- id: windows-softwaredistribution
+  match: '%SystemRoot%\SoftwareDistribution'
+  name: Windows Update working folder
+  owner: Windows Update
+  description: Windows Update's working folder, including its database of update history. Leave the folder itself alone; the Download folder inside it is the part that can be cleared.
+  safety: never
+  tests:
+    match: ['%SystemRoot%\SoftwareDistribution']
+    no_match: ['%SystemRoot%\SoftwareDistribution\DataStore', '%SystemDrive%\SoftwareDistribution']
+
+- id: windows-update-downloads
+  match: '%SystemRoot%\SoftwareDistribution\Download'
+  name: Windows Update downloads
+  owner: Windows Update
+  description: Update files Windows has downloaded. Once updates are installed they are no longer needed, and Windows Update downloads again anything it still needs. Files are locked while an update is installing.
+  safety: rebuilds
+  tests:
+    match: ['%SystemRoot%\SoftwareDistribution\Download']
+    no_match: ['%SystemRoot%\SoftwareDistribution\Download\abc123', '%SystemRoot%\SoftwareDistribution\DataStore']
+
+- id: windows-delivery-optimization
+  match: '%SystemRoot%\ServiceProfiles\NetworkService\AppData\Local\Microsoft\Windows\DeliveryOptimization\Cache'
+  name: Delivery Optimization cache
+  owner: Windows Update
+  description: Pieces of Windows and Store updates kept so they can be shared with other PCs. Windows trims it automatically. Clear it with Disk Cleanup or the Temporary files page in Storage settings, which have access to this protected folder.
+  safety: delete-via-app
+  tests:
+    match: ['%SystemRoot%\ServiceProfiles\NetworkService\AppData\Local\Microsoft\Windows\DeliveryOptimization\Cache']
+    no_match: ['%SystemRoot%\ServiceProfiles\NetworkService\AppData\Local\Microsoft\Windows\DeliveryOptimization\Logs', '%SystemRoot%\ServiceProfiles\NetworkService\AppData\Local\Microsoft\Windows\DeliveryOptimization\Cache\abc']
+
+- id: windows-old
+  match: '%SystemDrive%\Windows.old'
+  name: Previous Windows installation
+  owner: Windows
+  description: A copy of your previous Windows installation, kept after a major upgrade so you can go back. Windows removes it on its own after about 10 days. Remove it sooner with Disk Cleanup (Previous Windows installations); after that you cannot roll back.
+  safety: delete-via-app
+  tests:
+    match: ['%SystemDrive%\Windows.old']
+    no_match: ['%SystemDrive%\Windows.old\Users', 'D:\Windows.old.backup']
+
+- id: windows-upgrade-bt
+  match: '%SystemDrive%\$Windows.~BT'
+  name: Windows upgrade files
+  owner: Windows Setup
+  description: Temporary files from a Windows upgrade or feature update, which can also hold data used to roll back a recent upgrade. It is needed while an upgrade is in progress. Disk Cleanup removes it as Temporary Windows installation files.
+  safety: delete-via-app
+  tests:
+    match: ['%SystemDrive%\$Windows.~BT']
+    no_match: ['%SystemDrive%\$Windows.~BT\Sources', '%SystemDrive%\$Windows.~WS']
+
+- id: windows-upgrade-ws
+  match: '%SystemDrive%\$Windows.~WS'
+  name: Windows upgrade download
+  owner: Windows Setup
+  description: Files downloaded by Windows upgrade tools such as the Media Creation Tool or Update Assistant. Once the upgrade is finished, Disk Cleanup removes it as Temporary Windows installation files.
+  safety: delete-via-app
+  tests:
+    match: ['%SystemDrive%\$Windows.~WS']
+    no_match: ['%SystemDrive%\$Windows.~WS\Sources', '%SystemDrive%\$Windows.~BT']
+
+- id: windows-system-volume-information
+  match: '**\System Volume Information'
+  name: System Volume Information
+  owner: Windows
+  description: A protected system folder on every drive. It holds System Restore points, shadow copies and indexing data. Control its size through System Protection settings, never by deleting it.
+  safety: never
+  tests:
+    match: ['%SystemDrive%\System Volume Information', 'D:\System Volume Information']
+    no_match: ['%SystemDrive%\System Volume Information\tracking.log', 'D:\System Volume Information Backup']
+
+- id: windows-recycle-bin
+  match: '**\$Recycle.Bin'
+  name: Recycle Bin
+  owner: Windows
+  description: The Recycle Bin for this drive. Files you delete in File Explorer stay here, still using space, until the bin is emptied. Empty it from Windows rather than deleting the folder.
+  safety: delete-via-app
+  action: empty-recycle-bin
+  tests:
+    match: ['%SystemDrive%\$Recycle.Bin', 'E:\$Recycle.Bin']
+    no_match: ['%SystemDrive%\$Recycle.Bin\S-1-5-21-1000', '%SystemDrive%\Recycler']
+
+- id: windows-memory-dump
+  match: '%SystemRoot%\MEMORY.DMP'
+  name: Crash memory dump
+  owner: Windows
+  description: A memory dump Windows wrote when it crashed with a blue screen. It can be as large as your RAM and is only useful for investigating that crash.
+  safety: safe
+  tests:
+    match: ['%SystemRoot%\MEMORY.DMP']
+    no_match: ['%SystemRoot%\Minidump\MEMORY.DMP', '%SystemDrive%\MEMORY.DMP']
+
+- id: windows-minidump
+  match: '%SystemRoot%\Minidump'
+  name: Crash minidumps
+  owner: Windows
+  description: Small dumps written each time Windows crashed with a blue screen. They are only useful for diagnosing those crashes.
+  safety: safe
+  tests:
+    match: ['%SystemRoot%\Minidump']
+    no_match: ['%SystemRoot%\Minidump\010124-12345-01.dmp', '%SystemRoot%\System32\Minidump']
+
+- id: windows-live-kernel-reports
+  match: '%SystemRoot%\LiveKernelReports'
+  name: Live kernel reports
+  owner: Windows
+  description: Diagnostic dumps written when a driver, often the graphics driver, recovered from an error without crashing the PC. They can be large and are only useful for troubleshooting.
+  safety: safe
+  tests:
+    match: ['%SystemRoot%\LiveKernelReports']
+    no_match: ['%SystemRoot%\LiveKernelReports\WATCHDOG', '%SystemDrive%\LiveKernelReports']
+
+- id: windows-wer-archive
+  match: '%ProgramData%\Microsoft\Windows\WER\ReportArchive'
+  name: Sent error reports
+  owner: Windows Error Reporting
+  description: Copies of error reports Windows has already sent to Microsoft. Disk Cleanup removes them as System error reports.
+  safety: safe
+  tests:
+    match: ['%ProgramData%\Microsoft\Windows\WER\ReportArchive']
+    no_match: ['%ProgramData%\Microsoft\Windows\WER', '%ProgramData%\Microsoft\Windows\WER\ReportArchive\AppCrash_x']
+
+- id: windows-wer-queue
+  match: '%ProgramData%\Microsoft\Windows\WER\ReportQueue'
+  name: Queued error reports
+  owner: Windows Error Reporting
+  description: Error reports waiting to be sent to Microsoft, sometimes with large crash dumps attached. Disk Cleanup removes them as System queued error reports.
+  safety: safe
+  tests:
+    match: ['%ProgramData%\Microsoft\Windows\WER\ReportQueue']
+    no_match: ['%ProgramData%\Microsoft\Windows\WER\ReportArchive', '%ProgramData%\Microsoft\Windows\WER\ReportQueue\AppCrash_x']
+
+- id: windows-crashdumps
+  match: '%LOCALAPPDATA%\CrashDumps'
+  name: Program crash dumps
+  owner: Windows Error Reporting
+  description: Dumps saved when programs stopped unexpectedly. They are only useful for diagnosing those crashes.
+  safety: safe
+  tests:
+    match: ['%LOCALAPPDATA%\CrashDumps']
+    no_match: ['%LOCALAPPDATA%\CrashDumps\app.exe.1234.dmp', '%APPDATA%\CrashDumps']
+
+- id: windows-installer-cache
+  match: '%SystemRoot%\Installer'
+  name: Windows Installer cache
+  owner: Windows Installer
+  description: A hidden store of the setup files Windows Installer needs to repair, update or uninstall programs. Deleting files here breaks the updates and uninstalls of installed software.
+  safety: never
+  tests:
+    match: ['%SystemRoot%\Installer']
+    no_match: ['%SystemRoot%\Installer\$PatchCache$', '%SystemDrive%\Installer']
+
+- id: windows-prefetch
+  match: '%SystemRoot%\Prefetch'
+  name: Prefetch data
+  owner: Windows
+  description: Data Windows uses to start programs you use often more quickly. It is small and Windows recreates it, so removing it only makes programs start a little slower for a while.
+  safety: rebuilds
+  tests:
+    match: ['%SystemRoot%\Prefetch']
+    no_match: ['%SystemRoot%\Prefetch\CHROME.EXE-1234.pf', '%SystemRoot%\System32\Prefetch']
+
+- id: windows-font-cache
+  match: '%SystemRoot%\ServiceProfiles\LocalService\AppData\Local\FontCache'
+  name: Font cache
+  owner: Windows Font Cache service
+  description: Cached font data used to draw text quickly. Windows rebuilds it, but the files are in use while Windows runs and the folder is normally small.
+  safety: rebuilds
+  tests:
+    match: ['%SystemRoot%\ServiceProfiles\LocalService\AppData\Local\FontCache']
+    no_match: ['%SystemRoot%\ServiceProfiles\LocalService\AppData\Local\FontCache\Fonts', '%SystemRoot%\Fonts']
+
+- id: windows-thumbnail-cache
+  match: '%LOCALAPPDATA%\Microsoft\Windows\Explorer'
+  name: Thumbnail and icon cache
+  owner: File Explorer
+  description: Thumbnail and icon caches used by File Explorer. Windows recreates them as you browse, so thumbnails load slowly for a while. Disk Cleanup removes them as Thumbnails.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\Microsoft\Windows\Explorer']
+    no_match: ['%LOCALAPPDATA%\Microsoft\Windows\Explorer\thumbcache_256.db', '%SystemRoot%\Explorer']
+
+- id: windows-defender-history
+  match: '%ProgramData%\Microsoft\Windows Defender\Scans\History'
+  name: Microsoft Defender scan history
+  owner: Microsoft Defender Antivirus
+  description: Records of past Microsoft Defender scans and detections. Defender protects this folder and removes old entries itself.
+  safety: never
+  tests:
+    match: ['%ProgramData%\Microsoft\Windows Defender\Scans\History']
+    no_match: ['%ProgramData%\Microsoft\Windows Defender\Scans', '%ProgramData%\Microsoft\Windows Defender\Scans\History\Service']
+
+- id: windows-cbs-persist-log
+  match: '%SystemRoot%\Logs\CBS\CbsPersist_*'
+  name: Archived servicing log
+  owner: Windows Update
+  description: An older Component-Based Servicing log that Windows archived when the current log grew too big. It is only useful for diagnosing past update problems.
+  safety: safe
+  tests:
+    match: ['%SystemRoot%\Logs\CBS\CbsPersist_20240101120000.cab', '%SystemRoot%\Logs\CBS\CbsPersist_20240101120000.log']
+    no_match: ['%SystemRoot%\Logs\CBS\CBS.log', '%SystemRoot%\Logs\DISM\CbsPersist_1.cab']
+
+- id: windows-panther
+  match: '%SystemRoot%\Panther'
+  name: Windows setup logs
+  owner: Windows Setup
+  description: Logs and settings from Windows installation and upgrades. It is usually small and setup may need it, so leave it in place.
+  safety: never
+  tests:
+    match: ['%SystemRoot%\Panther']
+    no_match: ['%SystemRoot%\Panther\setupact.log', '%SystemDrive%\$Windows.~BT\Sources\Panther']
+
+- id: windows-driver-store
+  match: '%SystemRoot%\System32\DriverStore\FileRepository'
+  name: Driver store
+  owner: Windows
+  description: A copy of every driver package installed on this PC, used to set devices up again when they are reconnected. Disk Cleanup can remove old driver versions (Device driver packages); never delete them by hand.
+  safety: never
+  tests:
+    match: ['%SystemRoot%\System32\DriverStore\FileRepository']
+    no_match: ['%SystemRoot%\System32\DriverStore', '%SystemRoot%\System32\DriverStore\FileRepository\nvlt.inf_amd64_123']
+
+- id: windows-search-index
+  match: '%ProgramData%\Microsoft\Search\Data'
+  name: Windows Search index
+  owner: Windows Search
+  description: The index that makes searching your files fast. If it has grown very large, rebuild it from Indexing Options in Control Panel rather than deleting it.
+  safety: delete-via-app
+  tests:
+    match: ['%ProgramData%\Microsoft\Search\Data']
+    no_match: ['%ProgramData%\Microsoft\Search', '%ProgramData%\Microsoft\Search\Data\Applications']
+
+- id: windows-store-apps
+  match: '%ProgramFiles%\WindowsApps'
+  name: Microsoft Store apps
+  owner: Microsoft Store
+  description: Where Microsoft Store apps and many Xbox app games are installed. The folder is protected; uninstall apps from Settings to free the space.
+  safety: delete-via-app
+  action: uninstall-app
+  tests:
+    match: ['%ProgramFiles%\WindowsApps']
+    no_match: ['%ProgramFiles%\WindowsApps\Microsoft.WindowsCalculator_1.0', '%ProgramFiles(x86)%\WindowsApps']
+
+- id: windows-app-packages-data
+  match: '%LOCALAPPDATA%\Packages'
+  name: Store app data
+  owner: Microsoft Store apps
+  description: Settings, data and caches for Microsoft Store apps, one subfolder per app. Uninstalling an app removes its folder; deleting by hand can lose that app's data.
+  safety: never
+  tests:
+    match: ['%LOCALAPPDATA%\Packages']
+    no_match: ['%LOCALAPPDATA%\Packages\Microsoft.WindowsStore_8wekyb3d8bbwe', '%APPDATA%\Packages']

@@ -1,0 +1,212 @@
+# Everyday apps: chat, music, creative tools, mail, phone backups and driver installers.
+
+- id: apps-teams-cache
+  match: '%LOCALAPPDATA%\Packages\MSTeams_8wekyb3d8bbwe\LocalCache\Microsoft\MSTeams'
+  name: Microsoft Teams cache
+  owner: Microsoft Teams
+  description: Cache and local data for the new Microsoft Teams app. Teams downloads what it needs again, though you may have to sign in again. Quit Teams before removing it.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\Packages\MSTeams_8wekyb3d8bbwe\LocalCache\Microsoft\MSTeams']
+    no_match: ['%LOCALAPPDATA%\Packages\MSTeams_8wekyb3d8bbwe\LocalCache\Microsoft\MSTeams\EBWebView', '%LOCALAPPDATA%\Packages\MSTeams_8wekyb3d8bbwe\LocalCache\Microsoft']
+
+- id: apps-teams-classic
+  match: '%APPDATA%\Microsoft\Teams'
+  name: Classic Teams data
+  owner: Microsoft Teams (classic)
+  description: Cache and settings for classic Microsoft Teams, which Microsoft has retired. If you only use the new Teams, this folder is left over. Classic Teams recreates it if you still run it.
+  safety: rebuilds
+  tests:
+    match: ['%APPDATA%\Microsoft\Teams']
+    no_match: ['%APPDATA%\Microsoft\Teams\Cache', '%LOCALAPPDATA%\Microsoft\Teams']
+
+- id: apps-slack-cache
+  match: '%APPDATA%\Slack\Cache'
+  name: Slack cache
+  owner: Slack
+  description: Images and files Slack saved so channels load faster. Slack downloads them again as needed. Quit Slack before removing it.
+  safety: rebuilds
+  tests:
+    match: ['%APPDATA%\Slack\Cache']
+    no_match: ['%APPDATA%\Slack\Cache\Cache_Data', '%APPDATA%\Slack\storage']
+
+- id: apps-discord-cache
+  match: '%APPDATA%\discord\Cache'
+  name: Discord cache
+  owner: Discord
+  description: Images, videos and other media Discord saved from chats so they load faster. Discord downloads them again as needed. Quit Discord before removing it.
+  safety: rebuilds
+  tests:
+    match: ['%APPDATA%\discord\Cache']
+    no_match: ['%APPDATA%\discord\Cache\Cache_Data', '%LOCALAPPDATA%\Discord\Cache']
+
+- id: apps-discord-code-cache
+  match: '%APPDATA%\discord\Code Cache'
+  name: Discord code cache
+  owner: Discord
+  description: Compiled JavaScript Discord keeps so it starts faster. Discord recreates it.
+  safety: rebuilds
+  tests:
+    match: ['%APPDATA%\discord\Code Cache']
+    no_match: ['%APPDATA%\discord\Code Cache\js', '%APPDATA%\discord\Cache']
+
+- id: apps-spotify-data
+  match: '%LOCALAPPDATA%\Spotify\Data'
+  name: Spotify cache
+  owner: Spotify
+  description: Music Spotify cached while you listened, so it can play again without streaming. Spotify streams it again when needed. You can also clear it from Spotify's Storage settings.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\Spotify\Data']
+    no_match: ['%LOCALAPPDATA%\Spotify\Data\00', '%APPDATA%\Spotify\Data']
+
+- id: apps-spotify-storage
+  match: '%LOCALAPPDATA%\Spotify\Storage'
+  name: Spotify offline storage
+  owner: Spotify
+  description: Songs and podcasts downloaded in Spotify for offline listening. Remove downloads from within Spotify so it knows they are gone.
+  safety: delete-via-app
+  tests:
+    match: ['%LOCALAPPDATA%\Spotify\Storage']
+    no_match: ['%LOCALAPPDATA%\Spotify\Storage\ab', '%LOCALAPPDATA%\Spotify\Data']
+
+- id: apps-spotify-store-data
+  match: '%LOCALAPPDATA%\Packages\SpotifyAB.SpotifyMusic_zpdnekdrzrea0\LocalCache\Spotify\Data'
+  name: Spotify cache
+  owner: Spotify (Microsoft Store)
+  description: Music the Microsoft Store version of Spotify cached while you listened. Spotify streams it again when needed. You can also clear it from Spotify's Storage settings.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\Packages\SpotifyAB.SpotifyMusic_zpdnekdrzrea0\LocalCache\Spotify\Data']
+    no_match: ['%LOCALAPPDATA%\Packages\SpotifyAB.SpotifyMusic_zpdnekdrzrea0\LocalCache\Spotify\Data\00', '%LOCALAPPDATA%\Packages\SpotifyAB.SpotifyMusic_zpdnekdrzrea0\LocalCache\Spotify']
+
+- id: apps-zoom
+  match: '%APPDATA%\Zoom'
+  name: Zoom app
+  owner: Zoom
+  description: The Zoom app, installed for your user account, with its settings and logs. Uninstall Zoom from Settings if you no longer use it. Recordings are kept in your Documents folder, not here.
+  safety: delete-via-app
+  action: uninstall-app
+  tests:
+    match: ['%APPDATA%\Zoom']
+    no_match: ['%APPDATA%\Zoom\bin', '%USERPROFILE%\Documents\Zoom']
+
+- id: apps-adobe-media-cache-files
+  match: '%APPDATA%\Adobe\Common\Media Cache Files'
+  name: Adobe media cache files
+  owner: Adobe Premiere Pro, After Effects and Media Encoder
+  description: Audio and video files Adobe apps convert on import so editing is smooth. It often grows to many gigabytes. Adobe apps recreate the files when you open projects; you can also clean it in the Media Cache preferences.
+  safety: rebuilds
+  tests:
+    match: ['%APPDATA%\Adobe\Common\Media Cache Files']
+    no_match: ['%APPDATA%\Adobe\Common\Media Cache Files\clip.cfa', '%APPDATA%\Adobe\Common\Media Cache']
+
+- id: apps-adobe-media-cache
+  match: '%APPDATA%\Adobe\Common\Media Cache'
+  name: Adobe media cache database
+  owner: Adobe Premiere Pro, After Effects and Media Encoder
+  description: The database Adobe apps use to keep track of their media cache files. The apps recreate it when you open projects.
+  safety: rebuilds
+  tests:
+    match: ['%APPDATA%\Adobe\Common\Media Cache']
+    no_match: ['%APPDATA%\Adobe\Common\Media Cache\db', '%APPDATA%\Adobe\Common\Media Cache Files']
+
+- id: apps-outlook-data
+  match: '%LOCALAPPDATA%\Microsoft\Outlook'
+  name: Outlook data files
+  owner: Microsoft Outlook
+  description: Outlook's local mail files. OST files are offline copies of your mailbox that Outlook downloads again, but PST files here may be your only copy of archived mail. Manage them from Outlook's account settings.
+  safety: delete-via-app
+  tests:
+    match: ['%LOCALAPPDATA%\Microsoft\Outlook']
+    no_match: ['%LOCALAPPDATA%\Microsoft\Outlook\you@example.com.ost', '%APPDATA%\Microsoft\Outlook']
+
+- id: apps-itunes-backups
+  match: '%APPDATA%\Apple Computer\MobileSync\Backup'
+  name: iPhone and iPad backups
+  owner: iTunes
+  description: Backups of iPhones and iPads made by iTunes, often many gigabytes each. Delete old backups from iTunes. Removing a backup loses anything on that device that is not also in iCloud.
+  safety: delete-via-app
+  tests:
+    match: ['%APPDATA%\Apple Computer\MobileSync\Backup']
+    no_match: ['%APPDATA%\Apple Computer\MobileSync\Backup\00008030-001A2B3C4D5E', '%APPDATA%\Apple Computer\MobileSync']
+
+- id: apps-apple-devices-backups
+  match: '%USERPROFILE%\Apple\MobileSync\Backup'
+  name: iPhone and iPad backups
+  owner: Apple Devices or iTunes (Microsoft Store)
+  description: Backups of iPhones and iPads made by the Apple Devices app or the Microsoft Store version of iTunes, often many gigabytes each. Delete old backups from that app. Removing a backup loses anything on that device that is not also in iCloud.
+  safety: delete-via-app
+  tests:
+    match: ['%USERPROFILE%\Apple\MobileSync\Backup']
+    no_match: ['%USERPROFILE%\Apple\MobileSync\Backup\00008030-001A2B3C4D5E', '%USERPROFILE%\Apple\MobileSync']
+
+- id: apps-whatsapp
+  match: '%LOCALAPPDATA%\Packages\5319275A.WhatsAppDesktop_cv1g1gvanyjgm\LocalState'
+  name: WhatsApp data
+  owner: WhatsApp
+  description: Your WhatsApp chats, photos and videos stored on this PC. Deleting it signs you out and loses media that is not still on your phone.
+  safety: never
+  tests:
+    match: ['%LOCALAPPDATA%\Packages\5319275A.WhatsAppDesktop_cv1g1gvanyjgm\LocalState']
+    no_match: ['%LOCALAPPDATA%\Packages\5319275A.WhatsAppDesktop_cv1g1gvanyjgm\LocalState\shared', '%LOCALAPPDATA%\Packages\5319275A.WhatsAppDesktop_cv1g1gvanyjgm']
+
+- id: apps-steam-htmlcache
+  match: '%LOCALAPPDATA%\Steam\htmlcache'
+  name: Steam web cache
+  owner: Steam
+  description: Web pages and images the Steam client saved for its store and community pages. Steam downloads them again as needed. Quit Steam before removing it.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\Steam\htmlcache']
+    no_match: ['%LOCALAPPDATA%\Steam\htmlcache\Cache', '%ProgramFiles(x86)%\Steam\htmlcache']
+
+- id: apps-office-file-cache
+  match: '%LOCALAPPDATA%\Microsoft\Office\16.0\OfficeFileCache'
+  name: Office document cache
+  owner: Microsoft Office
+  description: Copies of Office documents used to sync them with OneDrive and SharePoint. It can hold changes that have not uploaded yet, so clear it with the Delete cached files option in OneDrive's Office settings.
+  safety: delete-via-app
+  tests:
+    match: ['%LOCALAPPDATA%\Microsoft\Office\16.0\OfficeFileCache']
+    no_match: ['%LOCALAPPDATA%\Microsoft\Office\16.0\OfficeFileCache\0', '%LOCALAPPDATA%\Microsoft\Office\16.0']
+
+- id: apps-nvidia-downloader
+  match: '%ProgramData%\NVIDIA Corporation\Downloader'
+  name: NVIDIA driver downloads
+  owner: NVIDIA app or GeForce Experience
+  description: Driver installers downloaded by the NVIDIA app or GeForce Experience. Once a driver is installed they are not needed, and the app downloads a new copy if it needs one.
+  safety: rebuilds
+  tests:
+    match: ['%ProgramData%\NVIDIA Corporation\Downloader']
+    no_match: ['%ProgramData%\NVIDIA Corporation\Downloader\latest', '%ProgramData%\NVIDIA Corporation']
+
+- id: apps-nvidia-extracted
+  match: '%SystemDrive%\NVIDIA'
+  name: NVIDIA installer files
+  owner: NVIDIA driver installer
+  description: Files an NVIDIA driver installer unpacked before installing. They are not needed once the driver is installed.
+  safety: safe
+  tests:
+    match: ['%SystemDrive%\NVIDIA']
+    no_match: ['%SystemDrive%\NVIDIA\DisplayDriver', '%ProgramFiles%\NVIDIA']
+
+- id: apps-amd-extracted
+  match: '%SystemDrive%\AMD'
+  name: AMD installer files
+  owner: AMD driver installer
+  description: Files AMD graphics and chipset driver installers unpacked before installing. They are not needed once the drivers are installed, and the installers can be downloaded again from AMD.
+  safety: safe
+  tests:
+    match: ['%SystemDrive%\AMD']
+    no_match: ['%SystemDrive%\AMD\Chipset_Software', '%ProgramFiles%\AMD']
+
+- id: apps-package-cache
+  match: '%ProgramData%\Package Cache'
+  name: Installer package cache
+  owner: Visual Studio, .NET, Visual C++ runtimes and other installers
+  description: Setup files many installers keep so their programs can be repaired, updated or uninstalled later. Deleting them can break those uninstalls and updates.
+  safety: never
+  tests:
+    match: ['%ProgramData%\Package Cache']
+    no_match: ['%ProgramData%\Package Cache\{0A1B2C3D-0000-0000-0000-000000000000}', '%LOCALAPPDATA%\Package Cache']

@@ -1,0 +1,242 @@
+# Web browser caches and profiles.
+# Chromium browsers keep one folder per profile under User Data (Default, Profile 1, ...).
+
+- id: browsers-chrome-cache
+  match: '%LOCALAPPDATA%\Google\Chrome\User Data\*\Cache'
+  name: Chrome cache
+  owner: Google Chrome
+  description: Images, scripts and other files Chrome saved from websites so pages load faster. Chrome downloads them again as needed. Close Chrome before removing it.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\Google\Chrome\User Data\Default\Cache', '%LOCALAPPDATA%\Google\Chrome\User Data\Profile 1\Cache']
+    no_match: ['%LOCALAPPDATA%\Google\Chrome\User Data\Default\Cache\Cache_Data', '%LOCALAPPDATA%\Google\Chrome\User Data\Cache', '%LOCALAPPDATA%\Google\Chrome\User Data\Default\Media Cache']
+
+- id: browsers-chrome-code-cache
+  match: '%LOCALAPPDATA%\Google\Chrome\User Data\*\Code Cache'
+  name: Chrome code cache
+  owner: Google Chrome
+  description: Compiled JavaScript that Chrome keeps so websites start faster. Chrome recreates it as you browse.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\Google\Chrome\User Data\Default\Code Cache']
+    no_match: ['%LOCALAPPDATA%\Google\Chrome\User Data\Default\Code Cache\js', '%LOCALAPPDATA%\Google\Chrome\User Data\Default\Cache']
+
+- id: browsers-chrome-gpu-cache
+  match: '%LOCALAPPDATA%\Google\Chrome\User Data\*\GPUCache'
+  name: Chrome GPU cache
+  owner: Google Chrome
+  description: Compiled graphics shaders Chrome uses to draw pages. It is small and Chrome recreates it.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\Google\Chrome\User Data\Default\GPUCache']
+    no_match: ['%LOCALAPPDATA%\Google\Chrome\User Data\Default\GPUCache\data_1', '%LOCALAPPDATA%\Google\Chrome\User Data\GPUCache']
+
+- id: browsers-chrome-service-worker-cache
+  match: '%LOCALAPPDATA%\Google\Chrome\User Data\*\Service Worker\CacheStorage'
+  name: Chrome site storage cache
+  owner: Google Chrome
+  description: Files websites stored for offline use and faster loading. Sites download them again, but web apps that work offline lose their offline content until you visit them again.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\Google\Chrome\User Data\Default\Service Worker\CacheStorage']
+    no_match: ['%LOCALAPPDATA%\Google\Chrome\User Data\Default\Service Worker\CacheStorage\abc', '%LOCALAPPDATA%\Google\Chrome\User Data\Default\Service Worker\Database']
+
+- id: browsers-chrome-profile
+  match: '%LOCALAPPDATA%\Google\Chrome\User Data'
+  name: Chrome profiles
+  owner: Google Chrome
+  description: Your Chrome profiles, with bookmarks, saved passwords, history, extensions and settings. Deleting it loses anything not synced to your Google account. Clear browsing data from Chrome's settings instead.
+  safety: never
+  tests:
+    match: ['%LOCALAPPDATA%\Google\Chrome\User Data']
+    no_match: ['%LOCALAPPDATA%\Google\Chrome\User Data\Default', '%LOCALAPPDATA%\Microsoft\Edge\User Data']
+
+- id: browsers-edge-cache
+  match: '%LOCALAPPDATA%\Microsoft\Edge\User Data\*\Cache'
+  name: Edge cache
+  owner: Microsoft Edge
+  description: Images, scripts and other files Edge saved from websites so pages load faster. Edge downloads them again as needed. Close Edge before removing it.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Cache', '%LOCALAPPDATA%\Microsoft\Edge\User Data\Profile 2\Cache']
+    no_match: ['%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Cache\Cache_Data', '%LOCALAPPDATA%\Microsoft\Edge\User Data\Cache']
+
+- id: browsers-edge-code-cache
+  match: '%LOCALAPPDATA%\Microsoft\Edge\User Data\*\Code Cache'
+  name: Edge code cache
+  owner: Microsoft Edge
+  description: Compiled JavaScript that Edge keeps so websites start faster. Edge recreates it as you browse.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Code Cache']
+    no_match: ['%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Code Cache\wasm', '%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Cache']
+
+- id: browsers-edge-gpu-cache
+  match: '%LOCALAPPDATA%\Microsoft\Edge\User Data\*\GPUCache'
+  name: Edge GPU cache
+  owner: Microsoft Edge
+  description: Compiled graphics shaders Edge uses to draw pages. It is small and Edge recreates it.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\GPUCache']
+    no_match: ['%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\GPUCache\index', '%LOCALAPPDATA%\Microsoft\Edge\User Data\GPUCache']
+
+- id: browsers-edge-service-worker-cache
+  match: '%LOCALAPPDATA%\Microsoft\Edge\User Data\*\Service Worker\CacheStorage'
+  name: Edge site storage cache
+  owner: Microsoft Edge
+  description: Files websites stored for offline use and faster loading. Sites download them again, but web apps that work offline lose their offline content until you visit them again.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Service Worker\CacheStorage']
+    no_match: ['%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Service Worker\CacheStorage\abc', '%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Service Worker']
+
+- id: browsers-edge-profile
+  match: '%LOCALAPPDATA%\Microsoft\Edge\User Data'
+  name: Edge profiles
+  owner: Microsoft Edge
+  description: Your Edge profiles, with favourites, saved passwords, history, extensions and settings. Deleting it loses anything not synced to your Microsoft account. Clear browsing data from Edge's settings instead.
+  safety: never
+  tests:
+    match: ['%LOCALAPPDATA%\Microsoft\Edge\User Data']
+    no_match: ['%LOCALAPPDATA%\Microsoft\Edge\User Data\Default', '%LOCALAPPDATA%\Google\Chrome\User Data']
+
+- id: browsers-brave-cache
+  match: '%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data\*\Cache'
+  name: Brave cache
+  owner: Brave
+  description: Images, scripts and other files Brave saved from websites so pages load faster. Brave downloads them again as needed. Close Brave before removing it.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data\Default\Cache']
+    no_match: ['%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data\Default\Cache\Cache_Data', '%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data\Cache']
+
+- id: browsers-brave-code-cache
+  match: '%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data\*\Code Cache'
+  name: Brave code cache
+  owner: Brave
+  description: Compiled JavaScript that Brave keeps so websites start faster. Brave recreates it as you browse.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data\Default\Code Cache']
+    no_match: ['%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data\Default\Code Cache\js', '%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data\Default\Cache']
+
+- id: browsers-brave-gpu-cache
+  match: '%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data\*\GPUCache'
+  name: Brave GPU cache
+  owner: Brave
+  description: Compiled graphics shaders Brave uses to draw pages. It is small and Brave recreates it.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data\Default\GPUCache']
+    no_match: ['%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data\Default\GPUCache\index', '%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data\GPUCache']
+
+- id: browsers-brave-service-worker-cache
+  match: '%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data\*\Service Worker\CacheStorage'
+  name: Brave site storage cache
+  owner: Brave
+  description: Files websites stored for offline use and faster loading. Sites download them again, but web apps that work offline lose their offline content until you visit them again.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data\Default\Service Worker\CacheStorage']
+    no_match: ['%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data\Default\Service Worker\CacheStorage\abc', '%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data\Default\Service Worker']
+
+- id: browsers-brave-profile
+  match: '%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data'
+  name: Brave profiles
+  owner: Brave
+  description: Your Brave profiles, with bookmarks, saved passwords, history, extensions, wallet data and settings. Deleting it loses anything not synced. Clear browsing data from Brave's settings instead.
+  safety: never
+  tests:
+    match: ['%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data']
+    no_match: ['%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data\Default', '%LOCALAPPDATA%\BraveSoftware\Brave-Browser']
+
+- id: browsers-vivaldi-cache
+  match: '%LOCALAPPDATA%\Vivaldi\User Data\*\Cache'
+  name: Vivaldi cache
+  owner: Vivaldi
+  description: Images, scripts and other files Vivaldi saved from websites so pages load faster. Vivaldi downloads them again as needed. Close Vivaldi before removing it.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\Vivaldi\User Data\Default\Cache']
+    no_match: ['%LOCALAPPDATA%\Vivaldi\User Data\Default\Cache\Cache_Data', '%LOCALAPPDATA%\Vivaldi\User Data\Cache']
+
+- id: browsers-vivaldi-code-cache
+  match: '%LOCALAPPDATA%\Vivaldi\User Data\*\Code Cache'
+  name: Vivaldi code cache
+  owner: Vivaldi
+  description: Compiled JavaScript that Vivaldi keeps so websites start faster. Vivaldi recreates it as you browse.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\Vivaldi\User Data\Default\Code Cache']
+    no_match: ['%LOCALAPPDATA%\Vivaldi\User Data\Default\Code Cache\js', '%LOCALAPPDATA%\Vivaldi\User Data\Default\Cache']
+
+- id: browsers-vivaldi-gpu-cache
+  match: '%LOCALAPPDATA%\Vivaldi\User Data\*\GPUCache'
+  name: Vivaldi GPU cache
+  owner: Vivaldi
+  description: Compiled graphics shaders Vivaldi uses to draw pages. It is small and Vivaldi recreates it.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\Vivaldi\User Data\Default\GPUCache']
+    no_match: ['%LOCALAPPDATA%\Vivaldi\User Data\Default\GPUCache\index', '%LOCALAPPDATA%\Vivaldi\User Data\GPUCache']
+
+- id: browsers-vivaldi-service-worker-cache
+  match: '%LOCALAPPDATA%\Vivaldi\User Data\*\Service Worker\CacheStorage'
+  name: Vivaldi site storage cache
+  owner: Vivaldi
+  description: Files websites stored for offline use and faster loading. Sites download them again, but web apps that work offline lose their offline content until you visit them again.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\Vivaldi\User Data\Default\Service Worker\CacheStorage']
+    no_match: ['%LOCALAPPDATA%\Vivaldi\User Data\Default\Service Worker\CacheStorage\abc', '%LOCALAPPDATA%\Vivaldi\User Data\Default\Service Worker']
+
+- id: browsers-vivaldi-profile
+  match: '%LOCALAPPDATA%\Vivaldi\User Data'
+  name: Vivaldi profiles
+  owner: Vivaldi
+  description: Your Vivaldi profiles, with bookmarks, saved passwords, history, notes, mail and settings. Deleting it loses anything not synced. Clear browsing data from Vivaldi's settings instead.
+  safety: never
+  tests:
+    match: ['%LOCALAPPDATA%\Vivaldi\User Data']
+    no_match: ['%LOCALAPPDATA%\Vivaldi\User Data\Default', '%LOCALAPPDATA%\Vivaldi\Application']
+
+- id: browsers-opera-cache
+  match: '%LOCALAPPDATA%\Opera Software\*\Cache'
+  name: Opera cache
+  owner: Opera
+  description: Images, scripts and other files Opera or Opera GX saved from websites so pages load faster. Opera downloads them again as needed. Close Opera before removing it.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\Opera Software\Opera Stable\Cache', '%LOCALAPPDATA%\Opera Software\Opera GX Stable\Cache']
+    no_match: ['%LOCALAPPDATA%\Opera Software\Opera Stable\Cache\Cache_Data', '%APPDATA%\Opera Software\Opera Stable\Cache']
+
+- id: browsers-opera-profile
+  match: '%APPDATA%\Opera Software'
+  name: Opera profiles
+  owner: Opera
+  description: Your Opera and Opera GX profiles, with bookmarks, saved passwords, history, extensions and settings. Deleting it loses anything not synced. Clear browsing data from Opera's settings instead.
+  safety: never
+  tests:
+    match: ['%APPDATA%\Opera Software']
+    no_match: ['%APPDATA%\Opera Software\Opera Stable', '%LOCALAPPDATA%\Opera Software']
+
+- id: browsers-firefox-cache
+  match: '%LOCALAPPDATA%\Mozilla\Firefox\Profiles\*\cache2'
+  name: Firefox cache
+  owner: Mozilla Firefox
+  description: Images, scripts and other files Firefox saved from websites so pages load faster. Firefox downloads them again as needed. Close Firefox before removing it.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\Mozilla\Firefox\Profiles\abcd1234.default-release\cache2']
+    no_match: ['%LOCALAPPDATA%\Mozilla\Firefox\Profiles\abcd1234.default-release\cache2\entries', '%APPDATA%\Mozilla\Firefox\Profiles\abcd1234.default-release\cache2']
+
+- id: browsers-firefox-profile
+  match: '%APPDATA%\Mozilla\Firefox\Profiles'
+  name: Firefox profiles
+  owner: Mozilla Firefox
+  description: Your Firefox profiles, with bookmarks, saved passwords, history, add-ons and settings. Deleting it loses anything not synced to your Mozilla account. Clear browsing data from Firefox's settings instead.
+  safety: never
+  tests:
+    match: ['%APPDATA%\Mozilla\Firefox\Profiles']
+    no_match: ['%APPDATA%\Mozilla\Firefox\Profiles\abcd1234.default-release', '%LOCALAPPDATA%\Mozilla\Firefox\Profiles']

@@ -1,0 +1,388 @@
+# Developer tool output and caches.
+
+- id: dev-node-modules
+  match: '**\node_modules'
+  name: Node.js packages (node_modules)
+  owner: npm, Yarn or pnpm
+  description: Packages installed for a JavaScript or TypeScript project. Running npm install (or yarn, pnpm install) in the project folder restores them, so you can delete this for projects you are not working on.
+  safety: rebuilds
+  tests:
+    match: ['%USERPROFILE%\code\app\node_modules', 'D:\work\node_modules']
+    no_match: ['%USERPROFILE%\code\app\node_modules\react', '%USERPROFILE%\code\node_modules_backup']
+
+- id: dev-node-modules-installed-app
+  match: '%ProgramFiles%\**\node_modules'
+  name: Packages that ship with an installed app
+  owner: the app it belongs to
+  description: Part of an installed program, such as Node.js itself or an editor built on Electron. npm install does not bring these back. Uninstall the app to remove them.
+  safety: delete-via-app
+  tests:
+    match: ['%ProgramFiles%\nodejs\node_modules', '%ProgramFiles%\Microsoft VS Code\resources\app\node_modules']
+    no_match: ['%USERPROFILE%\code\app\node_modules', '%ProgramFiles%\nodejs']
+
+- id: dev-node-modules-installed-app-x86
+  match: '%ProgramFiles(x86)%\**\node_modules'
+  name: Packages that ship with an installed app
+  owner: the app it belongs to
+  description: Part of an installed program. npm install does not bring these back. Uninstall the app to remove them.
+  safety: delete-via-app
+  tests:
+    match: ['%ProgramFiles(x86)%\Some App\resources\node_modules']
+    no_match: ['%USERPROFILE%\code\app\node_modules']
+
+- id: dev-node-modules-user-app
+  match: '%LOCALAPPDATA%\Programs\**\node_modules'
+  name: Packages that ship with an installed app
+  owner: the app it belongs to
+  description: Part of a program installed for your account only, such as an editor built on Electron. npm install does not bring these back. Uninstall the app to remove them.
+  safety: delete-via-app
+  tests:
+    match: ['%LOCALAPPDATA%\Programs\Microsoft VS Code\resources\app\node_modules']
+    no_match: ['%LOCALAPPDATA%\Programs\Microsoft VS Code', '%USERPROFILE%\code\app\node_modules']
+
+- id: dev-npm-global
+  match: '%APPDATA%\npm\node_modules'
+  name: Global npm packages
+  owner: npm
+  description: Command-line tools installed with npm install -g. npm install does not bring these back. Remove the ones you no longer use with npm uninstall -g.
+  safety: delete-via-app
+  tests:
+    match: ['%APPDATA%\npm\node_modules']
+    no_match: ['%APPDATA%\npm', '%USERPROFILE%\code\app\node_modules']
+
+- id: dev-npm-cache
+  match: '%LOCALAPPDATA%\npm-cache'
+  name: npm cache
+  owner: npm
+  description: Packages npm has downloaded before, kept so installs are faster. npm downloads anything it needs again. npm cache clean --force empties it.
+  safety: rebuilds
+  learn_more: https://docs.npmjs.com/cli/commands/npm-cache
+  tests:
+    match: ['%LOCALAPPDATA%\npm-cache']
+    no_match: ['%LOCALAPPDATA%\npm-cache\_cacache', '%APPDATA%\npm']
+
+- id: dev-yarn-cache
+  match: '%LOCALAPPDATA%\Yarn\Cache'
+  name: Yarn cache
+  owner: Yarn
+  description: Packages Yarn has downloaded before, kept so installs are faster. Yarn downloads anything it needs again. yarn cache clean empties it.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\Yarn\Cache']
+    no_match: ['%LOCALAPPDATA%\Yarn\Cache\v6', '%LOCALAPPDATA%\Yarn']
+
+- id: dev-pnpm-store
+  match: '%LOCALAPPDATA%\pnpm\store'
+  name: pnpm package store
+  owner: pnpm
+  description: The shared store pnpm links project packages from. Projects keep working if it is removed, and pnpm downloads packages again on the next install. pnpm store prune removes only packages no project uses.
+  safety: rebuilds
+  learn_more: https://pnpm.io/cli/store
+  tests:
+    match: ['%LOCALAPPDATA%\pnpm\store']
+    no_match: ['%LOCALAPPDATA%\pnpm\store\v3', '%LOCALAPPDATA%\pnpm']
+
+- id: dev-pnpm-store-drive
+  match: '**\.pnpm-store'
+  name: pnpm package store
+  owner: pnpm
+  description: A pnpm package store, created at the root of a drive when your projects live on a different drive from your user folder. pnpm downloads packages again on the next install. pnpm store prune removes only packages no project uses.
+  safety: rebuilds
+  learn_more: https://pnpm.io/cli/store
+  tests:
+    match: ['D:\.pnpm-store']
+    no_match: ['D:\.pnpm-store\v3', 'D:\pnpm-store']
+
+- id: dev-nuget-packages
+  match: '%USERPROFILE%\.nuget\packages'
+  name: NuGet packages
+  owner: NuGet (.NET)
+  description: Every NuGet package version your .NET projects have restored. dotnet restore downloads what a project needs again. dotnet nuget locals global-packages --clear empties it.
+  safety: rebuilds
+  learn_more: https://learn.microsoft.com/nuget/consume-packages/managing-the-global-packages-and-cache-folders
+  tests:
+    match: ['%USERPROFILE%\.nuget\packages']
+    no_match: ['%USERPROFILE%\.nuget\packages\newtonsoft.json', '%USERPROFILE%\.nuget']
+
+- id: dev-nuget-http-cache
+  match: '%LOCALAPPDATA%\NuGet\v3-cache'
+  name: NuGet download cache
+  owner: NuGet (.NET)
+  description: NuGet's cache of package downloads and feed data. NuGet downloads again what it needs. dotnet nuget locals http-cache --clear empties it.
+  safety: rebuilds
+  learn_more: https://learn.microsoft.com/nuget/consume-packages/managing-the-global-packages-and-cache-folders
+  tests:
+    match: ['%LOCALAPPDATA%\NuGet\v3-cache']
+    no_match: ['%LOCALAPPDATA%\NuGet\v3-cache\abc', '%LOCALAPPDATA%\NuGet']
+
+- id: dev-gradle-caches
+  match: '%USERPROFILE%\.gradle\caches'
+  name: Gradle caches
+  owner: Gradle
+  description: Downloaded dependencies and build outputs Gradle shares between projects. Gradle downloads and rebuilds what it needs, so the next build is slower.
+  safety: rebuilds
+  tests:
+    match: ['%USERPROFILE%\.gradle\caches']
+    no_match: ['%USERPROFILE%\.gradle\caches\modules-2', '%USERPROFILE%\code\app\.gradle\caches']
+
+- id: dev-gradle-wrapper
+  match: '%USERPROFILE%\.gradle\wrapper\dists'
+  name: Gradle versions
+  owner: Gradle
+  description: Gradle versions downloaded by the Gradle wrapper, often several. Each project downloads the version it needs again on its next build.
+  safety: rebuilds
+  tests:
+    match: ['%USERPROFILE%\.gradle\wrapper\dists']
+    no_match: ['%USERPROFILE%\.gradle\wrapper\dists\gradle-8.5-bin', '%USERPROFILE%\.gradle\wrapper']
+
+- id: dev-maven-repository
+  match: '%USERPROFILE%\.m2\repository'
+  name: Maven repository
+  owner: Maven
+  description: Libraries Maven has downloaded for Java projects. Maven downloads them again on the next build. Artifacts you built yourself with mvn install are only here and need rebuilding.
+  safety: rebuilds
+  tests:
+    match: ['%USERPROFILE%\.m2\repository']
+    no_match: ['%USERPROFILE%\.m2\repository\org', '%USERPROFILE%\.m2']
+
+- id: dev-cargo-registry
+  match: '%USERPROFILE%\.cargo\registry'
+  name: Cargo registry cache
+  owner: Cargo (Rust)
+  description: Crates and the crate index Cargo has downloaded for Rust projects. Cargo downloads what it needs again on the next build.
+  safety: rebuilds
+  learn_more: https://doc.rust-lang.org/cargo/guide/cargo-home.html
+  tests:
+    match: ['%USERPROFILE%\.cargo\registry']
+    no_match: ['%USERPROFILE%\.cargo\registry\cache', '%USERPROFILE%\.cargo\bin']
+
+- id: dev-rustup-toolchains
+  match: '%USERPROFILE%\.rustup\toolchains'
+  name: Rust toolchains
+  owner: rustup
+  description: Rust compiler versions installed by rustup. Remove ones you no longer use with rustup toolchain uninstall so rustup stays consistent.
+  safety: delete-via-app
+  tests:
+    match: ['%USERPROFILE%\.rustup\toolchains']
+    no_match: ['%USERPROFILE%\.rustup\toolchains\stable-x86_64-pc-windows-msvc', '%USERPROFILE%\.rustup']
+
+- id: dev-pip-cache
+  match: '%LOCALAPPDATA%\pip\Cache'
+  name: pip cache
+  owner: pip (Python)
+  description: Python packages pip has downloaded or built before, kept so installs are faster. pip downloads them again as needed. pip cache purge empties it.
+  safety: rebuilds
+  learn_more: https://pip.pypa.io/en/stable/topics/caching/
+  tests:
+    match: ['%LOCALAPPDATA%\pip\Cache']
+    no_match: ['%LOCALAPPDATA%\pip\Cache\wheels', '%LOCALAPPDATA%\pip']
+
+- id: dev-pycache
+  match: '**\__pycache__'
+  name: Python bytecode cache
+  owner: Python
+  description: Compiled versions of a project's Python files. Python recreates them the next time the code runs.
+  safety: rebuilds
+  tests:
+    match: ['%USERPROFILE%\code\app\__pycache__', 'D:\work\api\pkg\__pycache__']
+    no_match: ['%USERPROFILE%\code\app\__pycache__\main.cpython-312.pyc', '%USERPROFILE%\code\app\pycache']
+
+- id: dev-python-venv
+  match: '**\.venv'
+  name: Python virtual environment
+  owner: Python
+  description: Packages installed for one Python project. It can be recreated from the project's requirements or lock file, but packages installed by hand without being recorded there are lost.
+  safety: delete-via-app
+  tests:
+    match: ['%USERPROFILE%\code\api\.venv']
+    no_match: ['%USERPROFILE%\code\api\.venv\Lib', '%USERPROFILE%\code\api\venv']
+
+- id: dev-conda-pkgs
+  match: '**\*conda3\pkgs'
+  name: Conda package cache
+  owner: Anaconda or Miniconda
+  description: Packages Conda has downloaded and unpacked. Environments may still use files from here, so clean it with conda clean --all rather than deleting it.
+  safety: delete-via-app
+  learn_more: https://docs.conda.io/projects/conda/en/latest/commands/clean.html
+  tests:
+    match: ['%USERPROFILE%\anaconda3\pkgs', '%USERPROFILE%\miniconda3\pkgs', '%ProgramData%\anaconda3\pkgs']
+    no_match: ['%USERPROFILE%\anaconda3\pkgs\numpy-1.26.4', '%USERPROFILE%\code\pkgs']
+
+- id: dev-huggingface-hub
+  match: '%USERPROFILE%\.cache\huggingface\hub'
+  name: Hugging Face model cache
+  owner: Hugging Face
+  description: AI models and datasets downloaded by Hugging Face libraries, often many gigabytes each. They are downloaded again the next time a program asks for them.
+  safety: rebuilds
+  learn_more: https://huggingface.co/docs/huggingface_hub/guides/manage-cache
+  tests:
+    match: ['%USERPROFILE%\.cache\huggingface\hub']
+    no_match: ['%USERPROFILE%\.cache\huggingface', '%USERPROFILE%\.cache\huggingface\hub\models--gpt2']
+
+- id: dev-ollama-models
+  match: '%USERPROFILE%\.ollama\models'
+  name: Ollama models
+  owner: Ollama
+  description: AI models downloaded by Ollama, often several gigabytes each. Remove ones you no longer use with ollama rm so Ollama's list stays correct.
+  safety: delete-via-app
+  tests:
+    match: ['%USERPROFILE%\.ollama\models']
+    no_match: ['%USERPROFILE%\.ollama\models\blobs', '%USERPROFILE%\.ollama']
+
+- id: dev-go-build-cache
+  match: '%LOCALAPPDATA%\go-build'
+  name: Go build cache
+  owner: Go
+  description: Compiled packages Go reuses to make builds faster. Go rebuilds what it needs, so the next build is slower. go clean -cache empties it.
+  safety: rebuilds
+  learn_more: https://pkg.go.dev/cmd/go#hdr-Build_and_test_caching
+  tests:
+    match: ['%LOCALAPPDATA%\go-build']
+    no_match: ['%LOCALAPPDATA%\go-build\00', '%LOCALAPPDATA%\go']
+
+- id: dev-go-module-cache
+  match: '%USERPROFILE%\go\pkg\mod'
+  name: Go module cache
+  owner: Go
+  description: Source code of Go modules your projects depend on. Go downloads them again on the next build. Its files are read-only, so clear it with go clean -modcache.
+  safety: rebuilds
+  tests:
+    match: ['%USERPROFILE%\go\pkg\mod']
+    no_match: ['%USERPROFILE%\go\pkg\mod\github.com', '%USERPROFILE%\go\pkg']
+
+- id: dev-visual-studio-vs
+  match: '**\.vs'
+  name: Visual Studio solution cache
+  owner: Visual Studio
+  description: Per-solution caches and IntelliSense databases Visual Studio keeps next to a solution. Visual Studio recreates it when you reopen the solution, losing only open tabs and similar window layout.
+  safety: rebuilds
+  tests:
+    match: ['%USERPROFILE%\source\repos\App\.vs']
+    no_match: ['%USERPROFILE%\source\repos\App\.vs\App', '%USERPROFILE%\source\repos\App\.vscode']
+
+- id: dev-visual-studio-package-cache
+  match: '%ProgramData%\Microsoft\VisualStudio\Packages'
+  name: Visual Studio package cache
+  owner: Visual Studio Installer
+  description: Installer packages Visual Studio keeps so it can repair or modify itself without downloading. Turn the cache off in the Visual Studio Installer rather than deleting it.
+  safety: delete-via-app
+  learn_more: https://learn.microsoft.com/visualstudio/install/disable-or-move-the-package-cache
+  tests:
+    match: ['%ProgramData%\Microsoft\VisualStudio\Packages']
+    no_match: ['%ProgramData%\Microsoft\VisualStudio\Packages\Microsoft.VisualCpp', '%ProgramData%\Microsoft\VisualStudio']
+
+- id: dev-vscode-cache
+  match: '%APPDATA%\Code\Cache'
+  name: VS Code cache
+  owner: Visual Studio Code
+  description: Web content cached by Visual Studio Code's interface. VS Code recreates it.
+  safety: rebuilds
+  tests:
+    match: ['%APPDATA%\Code\Cache']
+    no_match: ['%APPDATA%\Code\Cache\Cache_Data', '%APPDATA%\Code\User']
+
+- id: dev-vscode-cached-data
+  match: '%APPDATA%\Code\CachedData'
+  name: VS Code compiled code cache
+  owner: Visual Studio Code
+  description: Compiled code VS Code keeps so it starts faster. Folders for older VS Code versions are often left behind after updates. VS Code recreates what it needs.
+  safety: rebuilds
+  tests:
+    match: ['%APPDATA%\Code\CachedData']
+    no_match: ['%APPDATA%\Code\CachedData\abc123', '%APPDATA%\Code\CachedExtensionVSIXs']
+
+- id: dev-vscode-cached-vsix
+  match: '%APPDATA%\Code\CachedExtensionVSIXs'
+  name: VS Code extension downloads
+  owner: Visual Studio Code
+  description: Extension packages VS Code downloaded. Installed extensions keep working without them, and VS Code downloads them again if needed.
+  safety: rebuilds
+  tests:
+    match: ['%APPDATA%\Code\CachedExtensionVSIXs']
+    no_match: ['%APPDATA%\Code\CachedExtensionVSIXs\ms-python.python-2024.1.0', '%USERPROFILE%\.vscode\extensions']
+
+- id: dev-jetbrains-caches
+  match: '%LOCALAPPDATA%\JetBrains\*\caches'
+  name: JetBrains IDE caches
+  owner: JetBrains IDEs
+  description: Caches for a JetBrains IDE such as IntelliJ IDEA, PyCharm or Rider. The IDE rebuilds them, so opening projects is slower the next time.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\JetBrains\IntelliJIdea2024.1\caches', '%LOCALAPPDATA%\JetBrains\Rider2023.3\caches']
+    no_match: ['%LOCALAPPDATA%\JetBrains\IntelliJIdea2024.1\caches\content.dat', '%APPDATA%\JetBrains\IntelliJIdea2024.1\caches']
+
+- id: dev-jetbrains-index
+  match: '%LOCALAPPDATA%\JetBrains\*\index'
+  name: JetBrains IDE indexes
+  owner: JetBrains IDEs
+  description: Code indexes for a JetBrains IDE such as IntelliJ IDEA, PyCharm or Rider. The IDE rebuilds them, which takes a while the next time you open a project.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\JetBrains\PyCharm2024.2\index']
+    no_match: ['%LOCALAPPDATA%\JetBrains\PyCharm2024.2\index\stubs', '%LOCALAPPDATA%\JetBrains\index']
+
+- id: dev-android-sdk
+  match: '%LOCALAPPDATA%\Android\Sdk'
+  name: Android SDK
+  owner: Android Studio
+  description: Android platforms, build tools and emulator system images used to build Android apps. Remove parts you do not need with the SDK Manager in Android Studio.
+  safety: delete-via-app
+  tests:
+    match: ['%LOCALAPPDATA%\Android\Sdk']
+    no_match: ['%LOCALAPPDATA%\Android\Sdk\system-images', '%LOCALAPPDATA%\Android']
+
+- id: dev-android-avd
+  match: '%USERPROFILE%\.android\avd'
+  name: Android emulators
+  owner: Android Studio
+  description: Android emulator virtual devices, each with its own disk images that can be several gigabytes. Delete ones you no longer use from Device Manager in Android Studio.
+  safety: delete-via-app
+  tests:
+    match: ['%USERPROFILE%\.android\avd']
+    no_match: ['%USERPROFILE%\.android\avd\Pixel_7_API_34.avd', '%USERPROFILE%\.android']
+
+- id: dev-docker-desktop-data
+  match: '%LOCALAPPDATA%\Docker\wsl'
+  name: Docker Desktop data
+  owner: Docker Desktop
+  description: Virtual disks holding Docker Desktop's images, containers, volumes and build cache. Pruning removes what you no longer use; deleting the folder by hand loses every container and volume.
+  safety: delete-via-app
+  action: docker-prune
+  learn_more: https://docs.docker.com/reference/cli/docker/system/prune/
+  tests:
+    match: ['%LOCALAPPDATA%\Docker\wsl']
+    no_match: ['%LOCALAPPDATA%\Docker\wsl\disk', '%LOCALAPPDATA%\Docker']
+
+- id: dev-wsl-store-disk
+  match: '%LOCALAPPDATA%\Packages\*\LocalState\ext4.vhdx'
+  name: WSL Linux disk
+  owner: Windows Subsystem for Linux
+  description: The virtual disk of a Linux distribution installed from the Microsoft Store, holding all of its files. It grows but does not shrink by itself; compacting it returns free space to Windows. Deleting it destroys the distribution.
+  safety: delete-via-app
+  action: wsl-compact
+  learn_more: https://learn.microsoft.com/windows/wsl/disk-space
+  tests:
+    match: ['%LOCALAPPDATA%\Packages\CanonicalGroupLimited.Ubuntu_79rhkp1fndgsc\LocalState\ext4.vhdx']
+    no_match: ['%LOCALAPPDATA%\Packages\CanonicalGroupLimited.Ubuntu_79rhkp1fndgsc\LocalState\backup\ext4.vhdx', '%LOCALAPPDATA%\Docker\wsl\data\ext4.vhdx']
+
+- id: dev-wsl-disk
+  match: '%LOCALAPPDATA%\wsl\*\ext4.vhdx'
+  name: WSL Linux disk
+  owner: Windows Subsystem for Linux
+  description: The virtual disk of a Linux distribution installed with wsl --install, holding all of its files. It grows but does not shrink by itself; compacting it returns free space to Windows. Deleting it destroys the distribution.
+  safety: delete-via-app
+  action: wsl-compact
+  learn_more: https://learn.microsoft.com/windows/wsl/disk-space
+  tests:
+    match: ['%LOCALAPPDATA%\wsl\{8a3b1c2d-0000-4000-8000-123456789abc}\ext4.vhdx']
+    no_match: ['%LOCALAPPDATA%\Docker\wsl\data\ext4.vhdx', '%LOCALAPPDATA%\wsl\ext4.vhdx']
+
+- id: dev-unity-cache
+  match: '%LOCALAPPDATA%\Unity\cache'
+  name: Unity package cache
+  owner: Unity
+  description: Packages the Unity Package Manager has downloaded, shared between projects. Unity downloads them again when a project needs them.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\Unity\cache']
+    no_match: ['%LOCALAPPDATA%\Unity\cache\packages', '%LOCALAPPDATA%\Unity']

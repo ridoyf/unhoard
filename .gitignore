@@ -1,0 +1,17 @@
+# Build output
+bin/
+.task/
+*.syso
+build/windows/nsis/MicrosoftEdgeWebview2Setup.exe
+build/windows/icon.icns
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+# Regenerated from Go by `wails3 generate bindings`
+frontend/bindings/
+
+# Editors and OS
+.vscode/
+.idea/
+Thumbs.db

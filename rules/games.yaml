@@ -1,0 +1,178 @@
+# Game libraries, launchers and graphics shader caches.
+
+- id: games-steam-library
+  match: '**\steamapps\common'
+  name: Steam games
+  owner: Steam
+  description: Installed Steam games, one folder per game. Uninstall games from your Steam library so Steam knows they are gone; your cloud saves stay in your account.
+  safety: delete-via-app
+  action: uninstall-app
+  tests:
+    match: ['%ProgramFiles(x86)%\Steam\steamapps\common', 'D:\SteamLibrary\steamapps\common']
+    no_match: ['D:\SteamLibrary\steamapps\common\Portal 2', 'D:\SteamLibrary\steamapps']
+
+- id: games-steam-shadercache
+  match: '**\steamapps\shadercache'
+  name: Steam shader cache
+  owner: Steam
+  description: Graphics shaders Steam keeps per game so games run smoothly. Steam and the games rebuild them, which can cause some stutter for a while.
+  safety: rebuilds
+  tests:
+    match: ['%ProgramFiles(x86)%\Steam\steamapps\shadercache', 'D:\SteamLibrary\steamapps\shadercache']
+    no_match: ['D:\SteamLibrary\steamapps\shadercache\620', 'D:\SteamLibrary\steamapps\common\Game\shadercache']
+
+- id: games-steam-downloading
+  match: '**\steamapps\downloading'
+  name: Steam downloads in progress
+  owner: Steam
+  description: Partly downloaded games and updates. Removing it cancels those downloads, and Steam starts them again from the beginning.
+  safety: rebuilds
+  tests:
+    match: ['D:\SteamLibrary\steamapps\downloading']
+    no_match: ['D:\SteamLibrary\steamapps\downloading\620', 'D:\Downloads\downloading']
+
+- id: games-steam-workshop
+  match: '**\steamapps\workshop'
+  name: Steam Workshop items
+  owner: Steam
+  description: Mods and other Workshop items you subscribe to. Unsubscribe in Steam to remove them; Steam downloads again anything you are still subscribed to.
+  safety: delete-via-app
+  tests:
+    match: ['D:\SteamLibrary\steamapps\workshop']
+    no_match: ['D:\SteamLibrary\steamapps\workshop\content', 'D:\workshop']
+
+- id: games-epic-library
+  match: '%ProgramFiles%\Epic Games'
+  name: Epic Games library
+  owner: Epic Games Launcher
+  description: The default install folder for Epic Games Store games. Uninstall games from the library in the Epic Games Launcher.
+  safety: delete-via-app
+  action: uninstall-app
+  tests:
+    match: ['%ProgramFiles%\Epic Games']
+    no_match: ['%ProgramFiles%\Epic Games\Fortnite', '%ProgramFiles(x86)%\Epic Games']
+
+- id: games-xbox-library
+  match: '%SystemDrive%\XboxGames'
+  name: Xbox app games
+  owner: Xbox app
+  description: Games installed through the Xbox app or PC Game Pass. Uninstall them from the Xbox app or from Settings.
+  safety: delete-via-app
+  action: uninstall-app
+  tests:
+    match: ['%SystemDrive%\XboxGames']
+    no_match: ['%SystemDrive%\XboxGames\Halo Infinite', '%USERPROFILE%\XboxGames']
+
+- id: games-ea-library
+  match: '%ProgramFiles%\EA Games'
+  name: EA app games
+  owner: EA app
+  description: The default install folder for games from the EA app. Uninstall games from the EA app library.
+  safety: delete-via-app
+  action: uninstall-app
+  tests:
+    match: ['%ProgramFiles%\EA Games']
+    no_match: ['%ProgramFiles%\EA Games\Battlefield 2042', '%ProgramFiles%\Electronic Arts']
+
+- id: games-gog-library
+  match: '%ProgramFiles(x86)%\GOG Galaxy\Games'
+  name: GOG Galaxy games
+  owner: GOG Galaxy
+  description: The default install folder for games from GOG Galaxy. Uninstall games from GOG Galaxy.
+  safety: delete-via-app
+  action: uninstall-app
+  tests:
+    match: ['%ProgramFiles(x86)%\GOG Galaxy\Games']
+    no_match: ['%ProgramFiles(x86)%\GOG Galaxy\Games\Cyberpunk 2077', '%ProgramFiles(x86)%\GOG Galaxy']
+
+- id: games-ubisoft-library
+  match: '%ProgramFiles(x86)%\Ubisoft\Ubisoft Game Launcher\games'
+  name: Ubisoft Connect games
+  owner: Ubisoft Connect
+  description: The default install folder for games from Ubisoft Connect. Uninstall games from Ubisoft Connect.
+  safety: delete-via-app
+  action: uninstall-app
+  tests:
+    match: ['%ProgramFiles(x86)%\Ubisoft\Ubisoft Game Launcher\games']
+    no_match: ['%ProgramFiles(x86)%\Ubisoft\Ubisoft Game Launcher\games\Far Cry 6', '%ProgramFiles(x86)%\Ubisoft\Ubisoft Game Launcher']
+
+- id: games-riot-library
+  match: '%SystemDrive%\Riot Games'
+  name: Riot Games
+  owner: Riot Client
+  description: The default install folder for League of Legends, Valorant and other Riot games, plus the Riot Client. Uninstall them from Settings.
+  safety: delete-via-app
+  action: uninstall-app
+  tests:
+    match: ['%SystemDrive%\Riot Games']
+    no_match: ['%SystemDrive%\Riot Games\VALORANT', '%ProgramFiles%\Riot Games']
+
+- id: games-battlenet-cache
+  match: '%ProgramData%\Blizzard Entertainment\Battle.net\Cache'
+  name: Battle.net cache
+  owner: Battle.net
+  description: Temporary files the Battle.net launcher keeps. Battle.net recreates it; Blizzard suggests clearing it when the launcher misbehaves. Quit Battle.net first.
+  safety: rebuilds
+  tests:
+    match: ['%ProgramData%\Blizzard Entertainment\Battle.net\Cache']
+    no_match: ['%ProgramData%\Blizzard Entertainment\Battle.net\Cache\0a', '%ProgramData%\Blizzard Entertainment\Battle.net']
+
+- id: games-nvidia-dxcache
+  match: '%LOCALAPPDATA%\NVIDIA\DXCache'
+  name: NVIDIA DirectX shader cache
+  owner: NVIDIA graphics driver
+  description: Compiled DirectX shaders the NVIDIA driver keeps so games load and run smoothly. The driver rebuilds them, so games may stutter briefly the next time you play.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\NVIDIA\DXCache']
+    no_match: ['%LOCALAPPDATA%\NVIDIA\DXCache\abc.nvph', '%LOCALAPPDATA%\NVIDIA\GLCache']
+
+- id: games-nvidia-glcache
+  match: '%LOCALAPPDATA%\NVIDIA\GLCache'
+  name: NVIDIA OpenGL and Vulkan shader cache
+  owner: NVIDIA graphics driver
+  description: Compiled OpenGL and Vulkan shaders the NVIDIA driver keeps so games load and run smoothly. The driver rebuilds them, so games may stutter briefly the next time you play.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\NVIDIA\GLCache']
+    no_match: ['%LOCALAPPDATA%\NVIDIA\GLCache\abc', '%LOCALAPPDATA%\NVIDIA\DXCache']
+
+- id: games-nvidia-perdriver-dxcache
+  match: '%USERPROFILE%\AppData\LocalLow\NVIDIA\PerDriverVersion\DXCache'
+  name: NVIDIA DirectX shader cache
+  owner: NVIDIA graphics driver
+  description: Compiled DirectX shaders newer NVIDIA drivers keep so games load and run smoothly. The driver rebuilds them, so games may stutter briefly the next time you play.
+  safety: rebuilds
+  tests:
+    match: ['%USERPROFILE%\AppData\LocalLow\NVIDIA\PerDriverVersion\DXCache']
+    no_match: ['%USERPROFILE%\AppData\LocalLow\NVIDIA\PerDriverVersion\DXCache\abc', '%LOCALAPPDATA%\NVIDIA\PerDriverVersion\DXCache']
+
+- id: games-d3dscache
+  match: '%LOCALAPPDATA%\D3DSCache'
+  name: DirectX shader cache
+  owner: Windows (DirectX)
+  description: Compiled graphics shaders DirectX keeps for games and apps. Windows rebuilds them as needed; Disk Cleanup removes them as DirectX Shader Cache.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\D3DSCache']
+    no_match: ['%LOCALAPPDATA%\D3DSCache\abc123', '%LOCALAPPDATA%\NVIDIA\DXCache']
+
+- id: games-amd-dxcache
+  match: '%LOCALAPPDATA%\AMD\DxCache'
+  name: AMD DirectX shader cache
+  owner: AMD graphics driver
+  description: Compiled DirectX shaders the AMD driver keeps so games load and run smoothly. The driver rebuilds them, so games may stutter briefly the next time you play. AMD Software can also reset it.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\AMD\DxCache']
+    no_match: ['%LOCALAPPDATA%\AMD\DxCache\abc.parc', '%LOCALAPPDATA%\NVIDIA\DXCache']
+
+- id: games-amd-vkcache
+  match: '%LOCALAPPDATA%\AMD\VkCache'
+  name: AMD Vulkan shader cache
+  owner: AMD graphics driver
+  description: Compiled Vulkan shaders the AMD driver keeps so games load and run smoothly. The driver rebuilds them, so games may stutter briefly the next time you play.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\AMD\VkCache']
+    no_match: ['%LOCALAPPDATA%\AMD\VkCache\abc', '%LOCALAPPDATA%\AMD\DxCache']

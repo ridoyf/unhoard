@@ -1,0 +1,243 @@
+:root {
+  color-scheme: light;
+  --paper: #edf0f3;
+  --surface: #ffffff;
+  --sunken: #e3e7ec;
+  --ink: #18202b;
+  --muted: #5b6676;
+  --line: #d5dbe2;
+  --accent: #005fb8;
+  --accent-ink: #ffffff;
+  --accent-soft: #dceaf7;
+
+  /* Safety ratings are the only other colour in the app. */
+  --safe: #2f8a3e;
+  --rebuilds: #0f7f86;
+  --delete-via-app: #a8660a;
+  --never: #c23a32;
+  --unknown: #8a94a3;
+
+  --radius-s: 4px;
+  --radius-m: 8px;
+  --radius-l: 10px;
+  --text-xs: 11px;
+  --text-s: 12px;
+  --text-m: 13px;
+  --font: 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Segoe UI Variable Display', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'Cascadia Mono', Consolas, monospace;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --paper: #10141a;
+  --surface: #171c24;
+  --sunken: #0c0f14;
+  --ink: #e3e7ed;
+  --muted: #94a0b0;
+  --line: #2a313c;
+  --accent: #60cdff;
+  --accent-ink: #10141a;
+  --accent-soft: #10304a;
+  --safe: #5cc46c;
+  --rebuilds: #3cc3c9;
+  --delete-via-app: #e6a53a;
+  --never: #f06a60;
+  --unknown: #6b7586;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 14px/1.45 var(--font);
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+}
+h1 {
+  font-size: 26px;
+  letter-spacing: -0.01em;
+}
+h2 {
+  font-size: 18px;
+}
+h3 {
+  font-size: 15px;
+}
+
+p {
+  margin: 0;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: var(--radius-s);
+  padding: 5px 12px;
+  min-height: 30px;
+}
+button:hover:not(:disabled) {
+  border-color: var(--muted);
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+button.danger {
+  color: var(--never);
+}
+button.quiet {
+  border-color: transparent;
+  background: transparent;
+}
+button.quiet:hover:not(:disabled) {
+  background: var(--sunken);
+}
+
+input,
+select {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-s);
+  padding: 5px 8px;
+  min-height: 30px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+a {
+  color: var(--accent);
+}
+
+pre,
+code {
+  font-family: var(--font-mono);
+  font-size: var(--text-s);
+}
+
+.muted {
+  color: var(--muted);
+}
+.small {
+  font-size: var(--text-m);
+}
+.num {
+  text-align: right;
+  white-space: nowrap;
+}
+.error-text {
+  color: var(--never);
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.view {
+  height: 100%;
+  overflow: auto;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.view > header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 72ch;
+}
+/* A view whose list scrolls inside it rather than scrolling the whole page. */
+.view.fill {
+  overflow: hidden;
+}
+.toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.grow {
+  flex: 1;
+}
+
+/* A list beside the "What is this?" inspector. */
+.split {
+  flex: 1;
+  min-height: 260px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 12px;
+}
+
+.data-table {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 1100px;
+}
+.data-table th,
+.data-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+.data-table th {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: var(--text-m);
+}
+.data-table .num {
+  text-align: right;
+}
+.data-table button {
+  min-height: 0;
+  padding: 2px 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

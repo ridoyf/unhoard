@@ -1,0 +1,14 @@
+{
+	"fixed": {
+		"file_version": "0.1.0"
+	},
+	"info": {
+		"0409": {
+			"ProductVersion": "0.1.0",
+			"CompanyName": "Ridoy Farhad",
+			"FileDescription": "Understand and reclaim disk space",
+			"LegalCopyright": "(c) 2026 Ridoy Farhad",
+			"ProductName": "Unhoard"
+		}
+	}
+}

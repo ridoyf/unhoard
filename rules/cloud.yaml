@@ -1,0 +1,84 @@
+# Cloud storage folders and sync app caches.
+
+- id: cloud-onedrive
+  match: '%OneDrive%'
+  name: OneDrive folder
+  owner: Microsoft OneDrive
+  description: Your OneDrive files. Files kept on this device use local space; making them online-only frees it while keeping them in the cloud. Deleting files here deletes them from OneDrive too.
+  safety: delete-via-app
+  action: cloud-online-only
+  tests:
+    match: ['%OneDrive%']
+    no_match: ['%OneDrive%\Documents', '%USERPROFILE%\OneDrive - Contoso']
+
+- id: cloud-onedrive-business
+  match: '%USERPROFILE%\OneDrive - *'
+  name: OneDrive work or school folder
+  owner: Microsoft OneDrive
+  description: Your OneDrive files for a work or school account. Files kept on this device use local space; making them online-only frees it while keeping them in the cloud. Deleting files here deletes them from OneDrive too.
+  safety: delete-via-app
+  action: cloud-online-only
+  tests:
+    match: ['%USERPROFILE%\OneDrive - Contoso', '%USERPROFILE%\OneDrive - Contoso Ltd']
+    no_match: ['%USERPROFILE%\OneDrive - Contoso\Documents', '%USERPROFILE%\OneDriveBackup']
+
+- id: cloud-onedrive-logs
+  match: '%LOCALAPPDATA%\Microsoft\OneDrive\logs'
+  name: OneDrive logs
+  owner: Microsoft OneDrive
+  description: Diagnostic logs written by the OneDrive app. They are only useful for troubleshooting, and OneDrive starts new ones.
+  safety: rebuilds
+  tests:
+    match: ['%LOCALAPPDATA%\Microsoft\OneDrive\logs']
+    no_match: ['%LOCALAPPDATA%\Microsoft\OneDrive\logs\Personal', '%LOCALAPPDATA%\Microsoft\OneDrive']
+
+- id: cloud-onedrive-app
+  match: '%LOCALAPPDATA%\Microsoft\OneDrive'
+  name: OneDrive app
+  owner: Microsoft OneDrive
+  description: The OneDrive app, installed for your user account, with its settings. Your files are not stored here. Uninstall OneDrive from Settings if you do not use it.
+  safety: delete-via-app
+  action: uninstall-app
+  tests:
+    match: ['%LOCALAPPDATA%\Microsoft\OneDrive']
+    no_match: ['%LOCALAPPDATA%\Microsoft\OneDrive\settings', '%OneDrive%']
+
+- id: cloud-dropbox-cache
+  match: '**\.dropbox.cache'
+  name: Dropbox cache
+  owner: Dropbox
+  description: A hidden folder where Dropbox keeps temporary copies of files it is syncing and recently deleted files. Dropbox empties it every few days on its own and recreates it.
+  safety: rebuilds
+  tests:
+    match: ['%USERPROFILE%\Dropbox\.dropbox.cache', 'D:\Dropbox (Personal)\.dropbox.cache']
+    no_match: ['%USERPROFILE%\Dropbox\.dropbox.cache\old_files', '%USERPROFILE%\Dropbox\.dropbox']
+
+- id: cloud-dropbox
+  match: '%USERPROFILE%\Dropbox'
+  name: Dropbox folder
+  owner: Dropbox
+  description: Your Dropbox files. Making files online-only in Dropbox frees local space while keeping them in the cloud. Deleting files here deletes them from Dropbox too.
+  safety: delete-via-app
+  tests:
+    match: ['%USERPROFILE%\Dropbox']
+    no_match: ['%USERPROFILE%\Dropbox\Photos', '%LOCALAPPDATA%\Dropbox']
+
+- id: cloud-google-drive-cache
+  match: '%LOCALAPPDATA%\Google\DriveFS'
+  name: Google Drive cache
+  owner: Google Drive for desktop
+  description: Google Drive for desktop's local copies of your Drive files and its account data. It may hold changes that have not uploaded yet. Change its location in Google Drive's settings, or disconnect the account to clear it.
+  safety: delete-via-app
+  tests:
+    match: ['%LOCALAPPDATA%\Google\DriveFS']
+    no_match: ['%LOCALAPPDATA%\Google\DriveFS\content_cache', '%LOCALAPPDATA%\Google\Chrome']
+
+- id: cloud-icloud-drive
+  match: '%USERPROFILE%\iCloudDrive'
+  name: iCloud Drive folder
+  owner: iCloud for Windows
+  description: Your iCloud Drive files. Choosing Free up space on files frees local space while keeping them in iCloud. Deleting files here deletes them from iCloud too.
+  safety: delete-via-app
+  tests:
+    match: ['%USERPROFILE%\iCloudDrive']
+    no_match: ['%USERPROFILE%\iCloudDrive\Desktop', '%USERPROFILE%\iCloud Photos']
