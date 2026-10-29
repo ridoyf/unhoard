@@ -6,7 +6,7 @@ Most disk tools stop at "this folder is big". Unhoard also answers the questions
 
 Nothing is deleted straight away. Removed items wait in a quarantine for a week and come back with one click, and Windows and program folders can never be removed.
 
-[Download](https://github.com/ridoyf/unhoard/releases/latest) · [How it keeps your files safe](#how-it-keeps-your-files-safe)
+[Download](https://github.com/ridoyf/unhoard/releases/latest) · [How it keeps your files safe](#how-it-keeps-your-files-safe) · [What is this folder, and can I delete it?](https://ridoyf.github.io/unhoard/)
 
 ![Explore view: a treemap coloured by safety rating above the folder list and the "What is this?" panel](docs/screenshots/explore-dark.png)
 
