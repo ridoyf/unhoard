@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"golang.org/x/sys/windows"
 )
 
 func mkdirs(t *testing.T, root string, dirs ...string) {
@@ -18,8 +20,32 @@ func mkdirs(t *testing.T, root string, dirs ...string) {
 	}
 }
 
-func TestCheck(t *testing.T) {
-	root := t.TempDir()
+func TestCheck(t *testing.T) { checkTable(t, t.TempDir()) }
+
+// CI runners have a short name in their temp path (C:\Users\RUNNER~1), so the
+// guard's own entries can hold short names too.
+func TestCheckUnderShortName(t *testing.T) {
+	long := filepath.Join(t.TempDir(), "Long Root Folder")
+	mkdirs(t, long, ".")
+	short := shortName(t, long)
+	if strings.EqualFold(short, long) {
+		t.Skip("8.3 names disabled on this volume")
+	}
+	checkTable(t, short)
+}
+
+func shortName(t *testing.T, p string) string {
+	t.Helper()
+	buf := make([]uint16, windows.MAX_LONG_PATH)
+	n, err := windows.GetShortPathName(windows.StringToUTF16Ptr(p), &buf[0], uint32(len(buf)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	return windows.UTF16ToString(buf[:n])
+}
+
+func checkTable(t *testing.T, root string) {
+	t.Helper()
 	mkdirs(t, root, `win\sys`, `win\temp\junk`, `users\bob\appdata\local\cache`, `users\bob\documents\a`, `progs\app`, `quar`, `free\stuff`, `users\bob\keys\k1`)
 	g := &Guard{
 		Subtree: []string{filepath.Join(root, "win"), filepath.Join(root, "quar"), filepath.Join(root, `users\*\keys`)},

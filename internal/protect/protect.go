@@ -168,12 +168,12 @@ func (g *Guard) checkOne(p string) error {
 	}
 	allowed := false
 	for _, a := range g.Allow {
-		if under(lp, lower(a)) {
+		if under(lp, canonical(a)) {
 			allowed = true
 		}
 	}
 	for _, s := range g.Subtree {
-		ss := strings.Split(lower(s), `\`)
+		ss := strings.Split(canonical(s), `\`)
 		if !allowed && prefixMatch(ss, segs) {
 			return fmt.Errorf("%w: %s is inside %s, which is protected", ErrProtected, p, s)
 		}
@@ -182,7 +182,7 @@ func (g *Guard) checkOne(p string) error {
 		}
 	}
 	for _, e := range g.Exact {
-		if prefixMatch(segs, strings.Split(lower(e), `\`)) {
+		if prefixMatch(segs, strings.Split(canonical(e), `\`)) {
 			return fmt.Errorf("%w: %s is or contains %s, which is protected", ErrProtected, p, e)
 		}
 	}
@@ -195,6 +195,23 @@ func (g *Guard) checkOne(p string) error {
 }
 
 func lower(p string) string { return strings.ToLower(filepath.Clean(p)) }
+
+// canonical is a guard entry in the form Check compares against: lower case, with
+// short names expanded up to its first * segment. Unexpanded, C:\Users\RUNNER~1
+// would never match a checked path, which is always expanded.
+func canonical(entry string) string {
+	if !strings.Contains(entry, "~") {
+		return lower(entry)
+	}
+	head, tail := entry, ""
+	if i := strings.Index(entry, `\*`); i >= 0 {
+		head, tail = entry[:i], entry[i:]
+	}
+	if long, err := longPath(filepath.Clean(head)); err == nil {
+		head = long
+	}
+	return lower(head + tail)
+}
 
 // under reports whether p is strictly inside dir.
 func under(p, dir string) bool {
@@ -239,7 +256,24 @@ func normalise(path string) (string, error) {
 	return p, nil
 }
 
+// longPath expands short names through the part of p that exists. A missing
+// name cannot be a short name for anything, so the rest is kept as it is.
 func longPath(p string) (string, error) {
+	dir, rest := p, ""
+	for {
+		long, err := getLongPathName(dir)
+		if err == nil {
+			return filepath.Join(long, rest), nil
+		}
+		missing := errors.Is(err, windows.ERROR_FILE_NOT_FOUND) || errors.Is(err, windows.ERROR_PATH_NOT_FOUND)
+		if !missing || filepath.Dir(dir) == dir {
+			return "", err
+		}
+		dir, rest = filepath.Dir(dir), filepath.Join(filepath.Base(dir), rest)
+	}
+}
+
+func getLongPathName(p string) (string, error) {
 	in, err := windows.UTF16PtrFromString(p)
 	if err != nil {
 		return "", err
