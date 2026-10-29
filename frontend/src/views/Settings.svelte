@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { api, type Settings, type UpdateInfo } from '../lib/api'
+  import { api, type Settings } from '../lib/api'
   import { errorText } from '../lib/format'
   import { tracked } from '../lib/activity.svelte'
   import Busy from '../components/Busy.svelte'
@@ -14,16 +14,12 @@
   // Loaded once rather than with loader(), so a scan finishing does not reset unsaved edits.
   let s = $state<Settings | null>(null)
   let loadError = $state('')
-  let update = $state<UpdateInfo | null>(null)
   let updateError = $state('')
   let checking = $state(false)
 
   $effect(() => {
     api.Settings().then(
-      (x) => {
-        s = x
-        if (x.checkUpdates) checkUpdate()
-      },
+      (x) => (s = x),
       (e) => (loadError = errorText(e)),
     )
   })
@@ -43,7 +39,7 @@
     updateError = ''
     checking = true
     try {
-      update = await api.CheckForUpdate()
+      ui.update = await api.CheckForUpdate()
     } catch (e) {
       updateError = errorText(e)
     } finally {
@@ -129,7 +125,7 @@
         <h2>Updates</h2>
         <label class="check">
           <input type="checkbox" bind:checked={s.checkUpdates} />
-          Check GitHub for a new version when this page opens
+          Check GitHub for a new version once a day
         </label>
         <p class="muted small">
           This only asks GitHub for the latest version number. Nothing is downloaded or installed,
@@ -139,18 +135,18 @@
           <button type="button" onclick={checkUpdate} disabled={checking}>Check now</button>
           {#if checking}
             <Busy label="Asking GitHub for the latest version" compact />
-          {:else if update}
-            {#if update.available}
-              <span>Version {update.latest} is available.</span>
+          {:else if ui.update}
+            {#if ui.update.available}
+              <span>Version {ui.update.latest} is available.</span>
               <button
                 type="button"
                 class="primary"
-                onclick={() => attempt(api.OpenURL(update?.url ?? ''))}
+                onclick={() => attempt(api.OpenURL(ui.update?.url ?? ''))}
               >
                 Open download page
               </button>
             {:else}
-              <span class="muted">You have the latest version ({update.current}).</span>
+              <span class="muted">You have the latest version ({ui.update.current}).</span>
             {/if}
           {:else if updateError}
             <span class="muted">Could not check: {updateError}</span>

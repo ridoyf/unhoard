@@ -176,6 +176,15 @@
         <span class="muted">No drive scanned yet.</span>
         <div class="grow"></div>
       {/if}
+      {#if ui.update?.available}
+        <button
+          class="quiet"
+          title="Opens the release page on GitHub"
+          onclick={() => attempt(api.OpenURL(ui.update?.url ?? ''))}
+        >
+          Version {ui.update.latest} is available
+        </button>
+      {/if}
       {#if ui.status && !ui.status.elevated}
         <button
           class="quiet"

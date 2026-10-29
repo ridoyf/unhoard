@@ -1,5 +1,5 @@
 import { Events } from '@wailsio/runtime'
-import { api, type Node, type Progress, type ScanInfo, type Status } from './api'
+import { api, type Node, type Progress, type ScanInfo, type Status, type UpdateInfo } from './api'
 import { listenForActivity } from './activity.svelte'
 import { errorText } from './format'
 
@@ -49,6 +49,7 @@ export const ui = $state({
   selected: null as Node | null,
   theme: 'auto' as Theme,
   notice: '',
+  update: null as UpdateInfo | null,
   dialog: null as Dialog | null,
   searchExt: '', // set by File types to prefill Search
   // Bumped whenever scan data changes (new scan, quarantine) so views refetch.
@@ -115,6 +116,20 @@ export async function init() {
     ui.folder = ui.scan.rootId
     ui.view = 'explore'
   }
+  checkForUpdateDaily()
+}
+
+// The tray keeps the app running for days, so a check at startup alone goes stale.
+function checkForUpdateDaily() {
+  const check = async () => {
+    try {
+      if ((await api.Settings()).checkUpdates) ui.update = await api.CheckForUpdate()
+    } catch {
+      // offline or GitHub unreachable: the next check tries again
+    }
+  }
+  check()
+  setInterval(check, 24 * 60 * 60 * 1000)
 }
 
 export async function startScan(root: string) {
