@@ -1,0 +1,82 @@
+{{define "head"}}<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{.}}</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --paper: #f6f7f9; --ink: #18202b; --muted: #5b6676; --line: #d5dbe2; --accent: #005fb8;
+    --safe: #2f8a3e; --rebuilds: #0f7f86; --delete-via-app: #a8660a; --never: #c23a32;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #10141a; --ink: #e3e7ed; --muted: #94a0b0; --line: #2a313c; --accent: #60cdff;
+      --safe: #5cc46c; --rebuilds: #3cc3c9; --delete-via-app: #e6a53a; --never: #f06a60;
+    }
+  }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.55 "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif; }
+  main { max-width: 44rem; margin: 0 auto; padding: 2rem 1rem 4rem; }
+  a { color: var(--accent); }
+  h1 { font-size: 1.75rem; line-height: 1.25; margin: 0.5rem 0 1rem; }
+  h2 { font-size: 1.1rem; margin: 2rem 0 0.5rem; }
+  code { font-family: "Cascadia Mono", Consolas, monospace; font-size: 0.9em; overflow-wrap: anywhere; }
+  .muted { color: var(--muted); }
+  .safety { display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 600; }
+  .safety::before { content: ""; width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--c); }
+  [data-safety="safe"] { --c: var(--safe); }
+  [data-safety="rebuilds"] { --c: var(--rebuilds); }
+  [data-safety="delete-via-app"] { --c: var(--delete-via-app); }
+  [data-safety="never"] { --c: var(--never); }
+  ul.rules { list-style: none; padding: 0; margin: 0; }
+  ul.rules li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.45rem 0; border-bottom: 1px solid var(--line); }
+  .cta { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+  footer { margin-top: 3rem; font-size: 0.875rem; }
+</style>
+</head>
+<body>
+<main>
+{{end}}
+
+{{define "foot"}}
+<footer class="muted">
+  From the knowledge base in <a href="https://github.com/ridoyf/unhoard">Unhoard</a>, a free, open-source disk space app for Windows.
+  Found a mistake? <a href="https://github.com/ridoyf/unhoard/issues/new?template=rule.yml">Open an issue</a>.
+</footer>
+</main>
+</body>
+</html>
+{{end}}
+
+{{define "index"}}{{template "head" "What is this folder, and can I delete it?"}}
+<h1>What is this folder, and can I delete it?</h1>
+<p>Common files and folders that take up space on Windows, what each one is, and whether it is safe to remove.</p>
+{{range .}}
+<h2>{{.Name}}</h2>
+<ul class="rules">
+{{range .Pages}}  <li><span><a href="./{{.ID}}/">{{.Name}}</a>{{if .Shared}} <code class="muted">{{.Match}}</code>{{end}}</span><span class="safety" data-safety="{{.Rule.Safety}}">{{.Safety}}</span></li>
+{{end}}</ul>
+{{end}}
+{{template "foot"}}{{end}}
+
+{{define "rule"}}{{template "head" .Title}}
+<p class="muted"><a href="../">All folders</a> · {{.Category}}</p>
+<h1>{{.Name}}</h1>
+<p><span class="safety" data-safety="{{.Rule.Safety}}">{{.Safety}}</span></p>
+<p>{{.Description}}</p>
+<p class="muted">Belongs to {{.Owner}}. Found at <code>{{.Match}}</code></p>
+
+<h2>Can I delete it?</h2>
+{{if eq .Rule.Safety "safe"}}<p>Yes. Nothing needs it, and removing it does not break {{.Owner}}.</p>
+{{else if eq .Rule.Safety "rebuilds"}}<p>Yes. {{.Owner}} recreates what it needs, so some of the space comes back over time and the next start may be slower.</p>
+{{else if eq .Rule.Safety "delete-via-app"}}<p>Not directly. Remove it through {{.Owner}}, so it knows it is gone.</p>
+{{else}}<p>No. {{.Owner}} needs it, and deleting it can stop things working.</p>
+{{end}}
+{{if .ActionTitle}}<p>Unhoard can do this the right way for you: <strong>{{.ActionTitle}}</strong>, with a preview of exactly what it will run.</p>
+{{else if or (eq .Rule.Safety "safe") (eq .Rule.Safety "rebuilds")}}<p>Close {{.Owner}} first. Unhoard moves it to a quarantine instead of deleting it, so you can put it back if something needs it.</p>
+{{end}}
+{{if .LearnMore}}<p><a href="{{.LearnMore}}">More about this from {{.Owner}}</a></p>{{end}}
+
+<p class="cta">Unhoard finds this and everything like it on your drive, and explains each one. <a href="https://github.com/ridoyf/unhoard/releases/latest">Download it free</a>.</p>
+{{template "foot"}}{{end}}

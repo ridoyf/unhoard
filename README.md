@@ -4,6 +4,10 @@ A free, open-source Windows app that shows where your disk space went, tells you
 
 Most disk tools stop at "this folder is big". Unhoard also answers the questions that come next: what is this, is it safe to delete, and what is the right way to remove it?
 
+Nothing is deleted straight away. Removed items wait in a quarantine for a week and come back with one click, and Windows and program folders can never be removed.
+
+[Download](https://github.com/ridoyf/unhoard/releases/latest) · [How it keeps your files safe](#how-it-keeps-your-files-safe)
+
 ![Explore view: a treemap coloured by safety rating above the folder list and the "What is this?" panel](docs/screenshots/explore-dark.png)
 
 ## What it does
@@ -18,6 +22,10 @@ Most disk tools stop at "this folder is big". Unhoard also answers the questions
 - Every scan is saved, so you can see what grew since last week and how a drive fills up over time.
 
 ![Free up space summary](docs/screenshots/free-up-space.png)
+
+## How it compares
+
+WinDirStat, WizTree, TreeSize and SpaceSniffer are good at showing where space went, and WizTree is faster on a full drive. None of them tell you what a folder is or the right way to remove it, so you are left searching "can I delete WinSxS?". Unhoard is built around that question. If you only want a fast picture of a drive, WizTree is a fine choice; if you want to know what you can safely clear, use Unhoard.
 
 ## How it keeps your files safe
 
@@ -37,6 +45,12 @@ Download the latest installer from [Releases](https://github.com/ridoyf/unhoard/
 
 The installer is not code-signed yet, so Windows SmartScreen may warn you the first time. Choose **More info**, then **Run anyway**.
 
+Every release is built by GitHub Actions from the tagged source. From v0.2.0 the release page links to the build log, and with the [GitHub CLI](https://cli.github.com) you can check that a download is the file that build produced:
+
+```
+gh attestation verify unhoard-amd64-installer.exe --repo ridoyf/unhoard
+```
+
 ## Build from source
 
 You need Go, Node.js and the Wails v3 CLI:
@@ -53,7 +67,7 @@ On a fresh clone, build the frontend once (`wails3 build`, or `npm run build` in
 
 ## Adding rules
 
-Rules live in [`rules/`](rules), one YAML file per category. Each rule carries its own test cases, and `go test ./internal/kb/` checks every one. You can also drop YAML files into `%LOCALAPPDATA%\Unhoard\rules` to override built-in rules by id without rebuilding.
+Rules live in [`rules/`](rules), one YAML file per category. Anything Unhoard does not recognise has a **Suggest a rule for this** link that opens a pre-filled issue, so you do not need to write YAML to help. Each rule carries its own test cases, and `go test ./internal/kb/` checks every one. You can also drop YAML files into `%LOCALAPPDATA%\Unhoard\rules` to override built-in rules by id without rebuilding.
 
 ## Contributing
 
